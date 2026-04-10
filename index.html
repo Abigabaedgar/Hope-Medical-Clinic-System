@@ -2,1000 +2,1002 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Hope Medical Clinic — Daily Records</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Hope Medical Clinic</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  :root {
-    --green: #1a7a4a;
-    --green-light: #e8f5ee;
-    --green-mid: #2da866;
-    --accent: #f0a500;
-    --danger: #d63b3b;
-    --bg: #f4f6f4;
-    --card: #ffffff;
-    --text: #1a1f1a;
-    --muted: #6b7a6b;
-    --border: #dde5dd;
-    --radius: 10px;
-    --shadow: 0 2px 12px rgba(0,0,0,0.07);
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+:root{
+  --teal:#1a3f52;--teal-d:#0d2a38;--teal-l:#e2eef2;--teal-m:#2a7a90;
+  --olive:#5a6b20;--olive-l:#eff3dc;
+  --orange:#d97b2a;--orange-l:#fdf2e6;
+  --danger:#c0392b;--danger-l:#fdf0ef;
+  --bg:#f2f5f4;--card:#fff;--text:#1a1f1e;--muted:#607068;--border:#dde6e4;
+  --r:10px;--sh:0 2px 14px rgba(0,0,0,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
-  /* Header */
-  header {
-    background: var(--green);
-    color: white;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-  }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 32px; height: 32px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
-  .logo-icon svg { width: 18px; height: 18px; }
-  .logo-text { font-size: 16px; font-weight: 600; letter-spacing: -0.3px; }
-  .logo-sub { font-size: 11px; opacity: 0.7; font-weight: 300; }
-  #header-date { font-family: 'DM Mono', monospace; font-size: 12px; opacity: 0.8; background: rgba(255,255,255,0.15); padding: 4px 10px; border-radius: 6px; }
+/* ── LOGIN ── */
+#pg-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0a2d3a,#1a3f52,#1e6b7a);padding:20px}
+.lcard{background:#fff;border-radius:20px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 24px 64px rgba(0,0,0,.22)}
+.llogo{display:flex;align-items:center;gap:14px;margin-bottom:30px}
+.llogo-icon{width:56px;height:56px;background:var(--teal-l);border-radius:16px;display:flex;align-items:center;justify-content:center}
+.llogo-icon svg{width:32px;height:32px}
+.ltitle{font-size:21px;font-weight:600;color:var(--teal-d);letter-spacing:-.4px}
+.lsub{font-size:12px;color:var(--muted);margin-top:2px}
+.lhd{font-size:15px;font-weight:500;margin-bottom:20px}
+.lfg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.lfg label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.lfg input{padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
+.lfg input:focus{border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(45,168,152,.12)}
+.lbtn{width:100%;padding:12px;background:var(--teal);color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;margin-top:4px}
+.lbtn:hover{background:var(--teal-d);transform:translateY(-1px);box-shadow:0 6px 16px rgba(26,122,110,.3)}
+.lerr{background:var(--danger-l);color:var(--danger);padding:9px 12px;border-radius:7px;font-size:13px;margin-top:12px;display:none}
+.ltag{text-align:center;margin-top:22px;font-size:12px;color:var(--muted);font-style:italic}
 
-  /* Tabs */
-  .tab-bar {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    overflow-x: auto;
-    padding: 0 16px;
-    gap: 4px;
-    position: sticky;
-    top: 60px;
-    z-index: 99;
-  }
-  .tab-bar::-webkit-scrollbar { display: none; }
-  .tab-btn {
-    flex-shrink: 0;
-    padding: 14px 18px 12px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--muted);
-    border: none;
-    background: none;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    white-space: nowrap;
-  }
-  .tab-btn:hover { color: var(--green); }
-  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); }
-  .tab-dot { width: 7px; height: 7px; border-radius: 50%; }
+/* ── APP ── */
+#pg-app{display:none}
+header{background:var(--teal);color:#fff;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.hL{display:flex;align-items:center;gap:12px}
+.hico{width:36px;height:36px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hico svg{width:22px;height:22px}
+.htit{font-size:15px;font-weight:600}
+.hsub{font-size:10px;opacity:.75}
+.hR{display:flex;align-items:center;gap:10px}
+.upill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px 4px 6px}
+.uav{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+.rbadge{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:10px}
+.rb-sa{background:#fff3e0;color:#b35a00}
+.rb-a{background:var(--olive-l);color:var(--olive)}
+.rb-s{background:var(--teal-l);color:var(--teal-d)}
+.logbtn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);color:#fff;padding:5px 12px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
+.logbtn:hover{background:rgba(255,255,255,.28)}
 
-  /* Main layout */
-  .main { max-width: 820px; margin: 0 auto; padding: 24px 16px 60px; }
+/* ── TABS ── */
+.tabbar{background:#fff;border-bottom:1px solid var(--border);display:flex;overflow-x:auto;padding:0 14px;position:sticky;top:58px;z-index:199}
+.tabbar::-webkit-scrollbar{display:none}
+.tbtn{flex-shrink:0;padding:13px 16px 11px;font-size:13px;font-weight:500;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.tbtn:hover{color:var(--teal)}
+.tbtn.active{color:var(--teal);border-bottom-color:var(--teal)}
+.tdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
 
-  /* Section header */
-  .section-header { margin-bottom: 20px; }
-  .section-title { font-size: 20px; font-weight: 600; letter-spacing: -0.4px; }
-  .section-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
+/* ── LAYOUT ── */
+.main{max-width:900px;margin:0 auto;padding:22px 14px 70px}
+.tc{display:none}.tc.active{display:block}
+.sh{margin-bottom:18px}
+.stit{font-size:19px;font-weight:600;letter-spacing:-.3px}
+.sdesc{font-size:13px;color:var(--muted);margin-top:3px}
 
-  /* Cards */
-  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 16px; overflow: hidden; }
-  .card-header { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
-  .card-title { font-size: 14px; font-weight: 600; }
-  .card-body { padding: 20px; }
+/* ── CARDS ── */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);border:1px solid var(--border);margin-bottom:16px;overflow:hidden}
+.cardh{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.cardht{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}
+.cardb{padding:18px}
 
-  /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-grid.three { grid-template-columns: 1fr 1fr 1fr; }
-  .form-grid.full { grid-template-columns: 1fr; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-group.span2 { grid-column: span 2; }
-  label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
-  input, select, textarea {
-    padding: 9px 12px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    font-size: 14px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text);
-    background: var(--bg);
-    transition: border-color 0.2s, box-shadow 0.2s;
-    outline: none;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--green-mid);
-    box-shadow: 0 0 0 3px rgba(45,168,102,0.12);
-    background: white;
-  }
-  textarea { resize: vertical; min-height: 70px; }
-  .total-display {
-    padding: 9px 12px;
-    background: var(--green-light);
-    border: 1px solid #b8ddc8;
-    border-radius: 7px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--green);
-    font-family: 'DM Mono', monospace;
-  }
+/* ── FILTER BAR ── */
+.fbar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.fbar label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.fbar input[type=date],.fbar select{padding:7px 10px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;background:#fff;outline:none;color:var(--text)}
+.fbar input[type=date]:focus,.fbar select:focus{border-color:var(--teal-m)}
+.fbtn{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .18s}
+.fbtn-p{background:var(--teal);color:#fff}
+.fbtn-p:hover{background:var(--teal-d)}
+.fbtn-s{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.fbtn-s:hover{background:var(--border)}
+.fbtn-g{background:var(--olive-l);color:var(--olive);border:1px solid #c8d490}
+.fbtn-g:hover{background:#dde89e}
 
-  /* Buttons */
-  .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
-  .btn { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.18s; font-family: 'DM Sans', sans-serif; }
-  .btn-primary { background: var(--green); color: white; }
-  .btn-primary:hover { background: #155d38; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(26,122,74,0.3); }
-  .btn-primary:active { transform: translateY(0); }
-  .btn-secondary { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
-  .btn-secondary:hover { background: var(--border); }
-  .btn-danger-sm { background: none; border: none; color: var(--danger); font-size: 12px; cursor: pointer; padding: 2px 6px; border-radius: 4px; }
-  .btn-danger-sm:hover { background: #fef0f0; }
+/* ── FORMS ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}
+.fgg{display:flex;flex-direction:column;gap:5px}
+.fgg.s2{grid-column:span 2}
+.fgg.s3{grid-column:span 3}
+label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+input,select,textarea{padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);background:var(--bg);transition:border-color .2s;outline:none}
+input:focus,select:focus,textarea:focus{border-color:var(--teal-m);box-shadow:0 0 0 3px rgba(45,168,152,.1);background:#fff}
+textarea{resize:vertical;min-height:64px}
+.tdp{padding:9px 12px;background:var(--teal-l);border:1.5px solid #b0d8d4;border-radius:7px;font-size:13px;font-weight:600;color:var(--teal);font-family:'DM Mono',monospace}
 
-  /* Toast */
-  #toast {
-    position: fixed; bottom: 24px; right: 24px; z-index: 999;
-    background: var(--green); color: white;
-    padding: 12px 20px; border-radius: 10px;
-    font-size: 13px; font-weight: 500;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    transform: translateY(80px); opacity: 0;
-    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    max-width: 300px;
-  }
-  #toast.show { transform: translateY(0); opacity: 1; }
-  #toast.error { background: var(--danger); }
+/* ── BUTTONS ── */
+.br{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
+.btn{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .18s;font-family:'DM Sans',sans-serif}
+.btn-p{background:var(--teal);color:#fff}.btn-p:hover{background:var(--teal-d);transform:translateY(-1px);box-shadow:0 4px 12px rgba(26,122,110,.3)}
+.btn-s{background:var(--bg);color:var(--muted);border:1px solid var(--border)}.btn-s:hover{background:var(--border)}
+.btn-d{background:none;border:none;color:var(--danger);font-size:12px;cursor:pointer;padding:3px 7px;border-radius:4px}.btn-d:hover{background:var(--danger-l)}
+.btn-pdf{background:none;border:none;color:var(--teal);font-size:12px;cursor:pointer;padding:3px 7px;border-radius:4px;font-weight:500}.btn-pdf:hover{background:var(--teal-l)}
 
-  /* Records table */
-  .records-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); border-bottom: 1px solid var(--border); }
-  td { padding: 9px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: var(--green-light); }
-  .amount-cell { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--green); }
-  .empty-state { text-align: center; padding: 32px; color: var(--muted); font-size: 13px; }
+/* ── TABLES ── */
+.rw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--teal-l)}
+.ac{font-family:'DM Mono',monospace;font-weight:500;color:var(--teal)}
+.ac-r{font-family:'DM Mono',monospace;font-weight:500;color:var(--danger)}
+.es{text-align:center;padding:32px;color:var(--muted);font-size:13px}
+.chip{font-size:11px;color:var(--muted);background:var(--bg);border-radius:10px;padding:2px 8px;border:1px solid var(--border);white-space:nowrap}
+.chip-sa{background:#fff3e0;color:#b35a00;border-color:#f5c87a}
+.chip-a{background:var(--olive-l);color:var(--olive);border-color:#c8d490}
+.chip-s{background:var(--teal-l);color:var(--teal-d);border-color:#a8d8d2}
+.badge-in{background:#e6f7ee;color:#1a7a4a;font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
+.badge-out{background:var(--danger-l);color:var(--danger);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:600}
 
-  /* Summary bar */
-  .summary-bar {
-    background: var(--green);
-    color: white;
-    border-radius: var(--radius);
-    padding: 16px 20px;
-    display: flex;
-    gap: 24px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-    align-items: center;
-  }
-  .summary-item { display: flex; flex-direction: column; gap: 2px; }
-  .summary-label { font-size: 10px; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.08em; }
-  .summary-value { font-size: 18px; font-weight: 600; font-family: 'DM Mono', monospace; }
-  .summary-divider { width: 1px; background: rgba(255,255,255,0.2); height: 36px; }
+/* ── SUMMARY ── */
+.sbar{background:var(--teal);color:#fff;border-radius:var(--r);padding:18px 22px;display:flex;gap:22px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.si{display:flex;flex-direction:column;gap:3px}
+.sl{font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.08em}
+.sv{font-size:20px;font-weight:600;font-family:'DM Mono',monospace}
+.sdv{width:1px;background:rgba(255,255,255,.2);height:40px}
+.snp{color:#a8f5e0}.snn{color:#ffb3b3}
 
-  /* Tabs content */
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+/* ── STOCK ── */
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:18px}
+.scard{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.scard-name{font-size:13px;font-weight:600;margin-bottom:6px}
+.scard-row{display:flex;justify-content:space-between;font-size:12px;margin-bottom:3px}
+.scard-label{color:var(--muted)}
+.scard-val{font-family:'DM Mono',monospace;font-weight:500}
+.scard-val.low{color:var(--danger)}
+.scard-val.ok{color:#1a7a4a}
+.scard-bar{height:5px;background:var(--border);border-radius:3px;margin-top:8px;overflow:hidden}
+.scard-fill{height:100%;border-radius:3px;transition:width .4s}
 
-  /* Loading */
-  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: middle; margin-right: 6px; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* ── USER MGMT ── */
+.user-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.user-info{display:flex;align-items:center;gap:12px}
+.user-av{width:36px;height:36px;border-radius:50%;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:var(--teal-d)}
+.user-name{font-size:13px;font-weight:600}
+.user-email{font-size:11px;color:var(--muted)}
+.user-actions{display:flex;gap:6px;align-items:center}
+.mod-tag{font-size:10px;background:var(--teal-l);color:var(--teal-d);border-radius:5px;padding:2px 7px;font-weight:500}
 
-  /* Entered by bar */
-  .staff-bar {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 20px;
-    font-size: 13px;
-  }
-  .staff-bar label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }
-  .staff-bar input { flex: 1; max-width: 220px; }
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px;padding:28px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:4px}
+.modal-close:hover{background:var(--bg)}
+.mfg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.mfg label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.mfg input,.mfg select{width:100%}
+.mod-check-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.mod-check{display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg)}
+.mod-check:hover{background:var(--teal-l);border-color:#a8d8d2}
+.mod-check input[type=checkbox]{width:14px;height:14px;accent-color:var(--teal);cursor:pointer}
 
-  @media (max-width: 600px) {
-    .form-grid, .form-grid.three { grid-template-columns: 1fr; }
-    .form-group.span2 { grid-column: span 1; }
-    .summary-bar { gap: 14px; }
-    .summary-value { font-size: 15px; }
-  }
+/* ── TOAST ── */
+#toast{position:fixed;bottom:20px;right:20px;z-index:999;background:var(--teal);color:#fff;padding:11px 18px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.15);transform:translateY(80px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:280px}
+#toast.show{transform:translateY(0);opacity:1}
+#toast.err{background:var(--danger)}
+
+/* ── SPINNER ── */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;vertical-align:middle;margin-right:5px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* ── AUDIT TAGS ── */
+.atag{font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500;white-space:nowrap}
+.at-d{background:#e6f7ee;color:#1a7a4a}
+.at-l{background:#e6f0fb;color:#1a5c9a}
+.at-r{background:#fef0e6;color:#a05a1a}
+.at-a{background:#fce6f6;color:#8a2a70}
+.at-f{background:#ede6f7;color:#5a3a8a}
+.at-e{background:var(--danger-l);color:var(--danger)}
+.at-st{background:var(--olive-l);color:var(--olive)}
+
+@media(max-width:600px){
+  .fg,.fg3{grid-template-columns:1fr}.fgg.s2,.fgg.s3{grid-column:span 1}
+  .sv{font-size:15px}.lcard{padding:28px 18px}
+  .hR .upill span:not(.uav){display:none}
+  .stock-grid{grid-template-columns:1fr 1fr}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">
-      <svg viewBox="0 0 20 20" fill="none">
-        <path d="M10 2v16M2 10h16" stroke="#1a7a4a" stroke-width="2.5" stroke-linecap="round"/>
-      </svg>
+<!-- LOGIN -->
+<div id="pg-login">
+  <div class="lcard">
+                <div class="llogo" style="justify-content:center;margin-bottom:20px">
+      <svg viewBox="0 0 500 170" width="340" height="115" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="heartclip">
+      <path d="M100 155 C100 155 28 110 28 68 C28 42 48 24 72 24 C86 24 98 32 104 44 C110 32 122 24 136 24 C160 24 180 42 180 68 C180 110 100 155 100 155Z"/>
+    </clipPath>
+  </defs>
+  <path d="M100 158 C100 158 24 111 24 67 C24 39 46 20 72 20 C87 20 100 29 104 42 C108 29 121 20 136 20 C162 20 184 39 184 67 C184 111 100 158 100 158Z" fill="#0d3d4a" opacity="0.4" transform="translate(3,4)"/>
+  <path d="M100 158 C100 158 24 111 24 67 C24 39 46 20 72 20 C87 20 100 29 104 42 C108 29 121 20 136 20 C162 20 184 39 184 67 C184 111 100 158 100 158Z" fill="none" stroke="#5ab8cc" stroke-width="4" opacity="0.5"/>
+  <path d="M100 155 C100 155 28 108 28 66 C28 40 48 22 72 22 C87 22 99 31 104 44 C109 31 121 22 136 22 C160 22 180 40 180 66 C180 108 100 155 100 155Z" fill="#1a3f52"/>
+  <path d="M72 28 C54 28 36 44 34 64 C60 38 88 30 104 44 C120 30 148 38 174 64 C172 44 154 28 136 28 C122 28 111 36 104 48 C97 36 86 28 72 28Z" fill="#2a7a90" opacity="0.35"/>
+  <rect x="96" y="44" width="16" height="52" rx="5" fill="white" opacity="0.95"/>
+  <rect x="74" y="62" width="60" height="16" rx="5" fill="white" opacity="0.95"/>
+  <text x="104" y="138" text-anchor="middle" font-family="Georgia,'Times New Roman',serif" font-size="20" font-weight="700" font-style="italic" fill="white" letter-spacing="1" opacity="0.95">Hope</text>
+  <text x="212" y="64" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="700" fill="#d97b2a">+</text>
+  <text x="228" y="68" font-family="Arial,Helvetica,sans-serif" font-size="32" font-weight="800" fill="#5a6b20" letter-spacing="2">MEDICAL</text>
+  <text x="228" y="104" font-family="Arial,Helvetica,sans-serif" font-size="32" font-weight="800" fill="#5a6b20" letter-spacing="2">CLINIC</text>
+  <rect x="458" y="93" width="7" height="7" fill="#5a6b20"/>
+  <text x="228" y="140" font-family="Georgia,serif" font-size="16" font-weight="400" fill="#6a7a6a" letter-spacing="0.5">We care for</text>
+  <rect x="358" y="124" width="54" height="26" rx="13" fill="#d97b2a"/>
+  <text x="385" y="142" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="14" font-weight="700" fill="white" letter-spacing="0.3">you</text>
+</svg>
     </div>
-    <div>
-      <div class="logo-text">Hope Medical Clinic</div>
-      <div class="logo-sub">Daily Records System</div>
-    </div>
+    <div class="lhd">Sign in to continue</div>
+    <div class="lfg"><label>Email</label><input type="email" id="le" placeholder="your@email.com" autocomplete="email"/></div>
+    <div class="lfg"><label>Password</label><input type="password" id="lp" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="lbtn" id="lbtn" onclick="doLogin()">Sign In</button>
+    <div class="lerr" id="lerr"></div>
   </div>
-  <div id="header-date"></div>
-</header>
-
-<div class="tab-bar">
-  <button class="tab-btn active" onclick="switchTab('drugs')" id="tab-drugs">
-    <span class="tab-dot" style="background:#2da866"></span> Retail Drugs
-  </button>
-  <button class="tab-btn" onclick="switchTab('lab')" id="tab-lab">
-    <span class="tab-dot" style="background:#4a90d9"></span> Lab
-  </button>
-  <button class="tab-btn" onclick="switchTab('rx')" id="tab-rx">
-    <span class="tab-dot" style="background:#e07b2a"></span> RX
-  </button>
-  <button class="tab-btn" onclick="switchTab('anc')" id="tab-anc">
-    <span class="tab-dot" style="background:#c45ca0"></span> ANC
-  </button>
-  <button class="tab-btn" onclick="switchTab('fp')" id="tab-fp">
-    <span class="tab-dot" style="background:#7b5ea7"></span> F/P
-  </button>
-  <button class="tab-btn" onclick="switchTab('expenditure')" id="tab-expenditure">
-    <span class="tab-dot" style="background:#d63b3b"></span> Expenditure
-  </button>
-  <button class="tab-btn" onclick="switchTab('summary')" id="tab-summary">
-    <span class="tab-dot" style="background:#f0a500"></span> Daily Summary
-  </button>
 </div>
 
-<div class="main">
+<!-- APP -->
+<div id="pg-app">
+  <header>
+                  <div class="hL">
+      <svg viewBox="0 0 320 58" width="240" height="44" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 52 C32 52 8 38 8 22 C8 13 15 7 23 7 C28 7 32 10 33 14 C34 10 38 7 43 7 C51 7 58 13 58 22 C58 38 32 52 32 52Z" fill="#0d3d4a" opacity="0.4" transform="translate(1,2)"/>
+  <path d="M32 52 C32 52 8 38 8 22 C8 13 15 7 23 7 C28 7 32 10 33 14 C34 10 38 7 43 7 C51 7 58 13 58 22 C58 38 32 52 32 52Z" fill="none" stroke="#5ab8cc" stroke-width="2" opacity="0.6"/>
+  <path d="M32 50 C32 50 9 37 9 22 C9 13 15 8 23 8 C28 8 31 11 33 15 C35 11 38 8 43 8 C51 8 57 13 57 22 C57 37 32 50 32 50Z" fill="#1a3f52"/>
+  <rect x="30" y="14" width="6" height="20" rx="2" fill="white" opacity="0.95"/>
+  <rect x="22" y="21" width="22" height="6" rx="2" fill="white" opacity="0.95"/>
+  <text x="33" y="46" text-anchor="middle" font-family="Georgia,serif" font-size="8" font-weight="700" font-style="italic" fill="white" opacity="0.9">Hope</text>
+  <text x="70" y="24" font-family="Arial,Helvetica,sans-serif" font-size="7" font-weight="700" fill="#d97b2a">+</text>
+  <text x="77" y="25" font-family="Arial,Helvetica,sans-serif" font-size="16" font-weight="800" fill="white" letter-spacing="1">MEDICAL CLINIC</text>
+  <text x="77" y="40" font-family="Georgia,serif" font-size="10" fill="rgba(255,255,255,0.75)" letter-spacing="0.3">We care for <tspan font-weight="700" fill="#d97b2a">you</tspan></text>
+</svg>
+    </div>
+    <div class="hR">
+      <div class="upill">
+        <div class="uav" id="uav">E</div>
+        <span id="uname" style="font-size:12px;color:#fff"></span>
+        <span class="rbadge" id="rbadge"></span>
+      </div>
+      <button class="logbtn" onclick="doLogout()">Sign out</button>
+    </div>
+  </header>
 
-  <!-- Staff bar -->
-  <div class="staff-bar">
-    <label>Staff Name</label>
-    <input type="text" id="global-staff" placeholder="Your name..." oninput="localStorage.setItem('clinic_staff', this.value)"/>
-    <span style="color:var(--muted); font-size:12px">Saved automatically</span>
+  <div class="tabbar" id="tabbar">
+    <button class="tbtn active" onclick="sw('drugs')" id="tb-drugs"><span class="tdot" style="background:#2da898"></span>Retail Drugs</button>
+    <button class="tbtn" onclick="sw('lab')" id="tb-lab"><span class="tdot" style="background:#4a90d9"></span>Lab</button>
+    <button class="tbtn" onclick="sw('rx')" id="tb-rx"><span class="tdot" style="background:#d97b2a"></span>RX</button>
+    <button class="tbtn" onclick="sw('anc')" id="tb-anc"><span class="tdot" style="background:#c45ca0"></span>ANC</button>
+    <button class="tbtn" onclick="sw('fp')" id="tb-fp"><span class="tdot" style="background:#7b5ea7"></span>F/P</button>
+    <button class="tbtn" onclick="sw('exp')" id="tb-exp"><span class="tdot" style="background:#c0392b"></span>Expenditure</button>
+    <button class="tbtn" onclick="sw('stock')" id="tb-stock"><span class="tdot" style="background:#6b7a2a"></span>Stock</button>
+    <button class="tbtn" onclick="sw('sum')" id="tb-sum" style="display:none"><span class="tdot" style="background:#d97b2a"></span>Summary</button>
+    <button class="tbtn" onclick="sw('audit')" id="tb-audit" style="display:none"><span class="tdot" style="background:#607068"></span>Audit</button>
+    <button class="tbtn" onclick="sw('users')" id="tb-users" style="display:none"><span class="tdot" style="background:#b35a00"></span>Users</button>
   </div>
 
-  <!-- RETAIL DRUGS -->
-  <div class="tab-content active" id="content-drugs">
-    <div class="section-header">
-      <div class="section-title">Retail Drugs</div>
-      <div class="section-desc">Record each drug dispensed — total amount is calculated automatically</div>
+  <div class="main">
+
+    <!-- DRUGS -->
+    <div class="tc active" id="tc-drugs">
+      <div class="sh"><div class="stit">Retail Drugs</div><div class="sdesc">Record drugs dispensed to patients</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#2da898"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg3" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="d-dt"/></div>
+          <div class="fgg"><label>Drug Name</label><input type="text" id="d-nm" placeholder="e.g. Amoxicillin 500mg"/></div>
+          <div class="fgg"><label>Quantity</label><input type="number" id="d-qt" placeholder="0" min="1" oninput="cDT()"/></div>
+          <div class="fgg"><label>Unit Price (UGX)</label><input type="number" id="d-pr" placeholder="0" oninput="cDT()"/></div>
+          <div class="fgg"><label>Total (UGX)</label><div class="tdp" id="d-tot">0</div></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('d')">Clear</button><button class="btn btn-p" id="d-sub" onclick="subD()">Add Entry</button></div></div>
+      </div>
+      <div class="card"><div class="cardh">
+        <div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="d-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="d-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lD()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('retail_drugs',['drug_name','quantity','unit_price','total_amount','entry_date','entered_by'])">Export CSV</button>
+        </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Drug</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>By</th><th>Actions</th></tr></thead><tbody id="dt"><tr><td colspan="7" class="es">No entries</td></tr></tbody></table></div></div></div>
     </div>
-    <div class="card">
-      <div class="card-header">
-        <span class="tab-dot" style="background:#2da866"></span>
-        <span class="card-title">New Entry</span>
+
+    <!-- LAB -->
+    <div class="tc" id="tc-lab">
+      <div class="sh"><div class="stit">Laboratory</div><div class="sdesc">Record tests and results</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#4a90d9"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="l-dt"/></div>
+          <div class="fgg"><label>Patient Ref</label><input type="text" id="l-pt" placeholder="Optional"/></div>
+          <div class="fgg"><label>Test Name</label><input type="text" id="l-tn" placeholder="e.g. Malaria RDT, FBC"/></div>
+          <div class="fgg"><label>Fee Charged (UGX)</label><input type="number" id="l-fe" placeholder="0"/></div>
+          <div class="fgg s2"><label>Result</label><input type="text" id="l-rs" placeholder="e.g. Positive, Negative, 12.5 g/dL"/></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('l')">Clear</button><button class="btn btn-p" id="l-sub" onclick="subL()">Add Entry</button></div></div>
       </div>
-      <div class="card-body">
-        <div class="form-grid three" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="drugs-date"/>
-          </div>
-          <div class="form-group">
-            <label>Drug Name</label>
-            <input type="text" id="drugs-name" placeholder="e.g. Amoxicillin 500mg"/>
-          </div>
-          <div class="form-group">
-            <label>Quantity</label>
-            <input type="number" id="drugs-qty" placeholder="0" min="1" oninput="calcDrugsTotal()"/>
-          </div>
-          <div class="form-group">
-            <label>Unit Price (UGX)</label>
-            <input type="number" id="drugs-price" placeholder="0" min="0" oninput="calcDrugsTotal()"/>
-          </div>
-          <div class="form-group">
-            <label>Total Amount (UGX)</label>
-            <div class="total-display" id="drugs-total">0</div>
-          </div>
+      <div class="card"><div class="cardh"><div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="l-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="l-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lL()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('lab_tests',['test_name','patient_ref','fee_charged','result','entry_date','entered_by'])">Export CSV</button>
         </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('drugs')">Clear</button>
-          <button class="btn btn-primary" id="drugs-submit" onclick="submitDrugs()">Add Entry</button>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Patient</th><th>Test</th><th>Result</th><th>Fee (UGX)</th><th>By</th><th>Actions</th></tr></thead><tbody id="lt"><tr><td colspan="7" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- RX -->
+    <div class="tc" id="tc-rx">
+      <div class="sh"><div class="stit">RX — Treatment</div><div class="sdesc">Record patient treatments</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#d97b2a"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="r-dt"/></div>
+          <div class="fgg"><label>Patient Ref</label><input type="text" id="r-pt" placeholder="Optional"/></div>
+          <div class="fgg s2"><label>Diagnosis</label><input type="text" id="r-dg" placeholder="e.g. Malaria, UTI"/></div>
+          <div class="fgg s2"><label>Treatment Given</label><textarea id="r-tr" placeholder="e.g. Artemether/Lumefantrine 6-dose..."></textarea></div>
+          <div class="fgg"><label>Amount Charged (UGX)</label><input type="number" id="r-am" placeholder="0"/></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('r')">Clear</button><button class="btn btn-p" id="r-sub" onclick="subR()">Add Entry</button></div></div>
+      </div>
+      <div class="card"><div class="cardh"><div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="r-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="r-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lR()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('rx_treatments',['diagnosis','treatment_given','amount_charged','patient_ref','entry_date','entered_by'])">Export CSV</button>
         </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Patient</th><th>Diagnosis</th><th>Treatment</th><th>Amount (UGX)</th><th>By</th><th>Actions</th></tr></thead><tbody id="rt"><tr><td colspan="7" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- ANC -->
+    <div class="tc" id="tc-anc">
+      <div class="sh"><div class="stit">ANC — Antenatal Care</div><div class="sdesc">Record antenatal visits</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#c45ca0"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="a-dt"/></div>
+          <div class="fgg"><label>Patient Ref</label><input type="text" id="a-pt" placeholder="Optional"/></div>
+          <div class="fgg"><label>Visit Type</label><select id="a-vt"><option value="">Select...</option><option>1st ANC Visit</option><option>2nd ANC Visit</option><option>3rd ANC Visit</option><option>4th ANC Visit</option><option>Follow-up</option><option>Delivery</option><option>Postnatal</option></select></div>
+          <div class="fgg"><label>Gestation (weeks)</label><input type="number" id="a-gs" placeholder="e.g. 28" min="4" max="42"/></div>
+          <div class="fgg"><label>Amount Charged (UGX)</label><input type="number" id="a-am" placeholder="0"/></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('a')">Clear</button><button class="btn btn-p" id="a-sub" onclick="subA()">Add Entry</button></div></div>
+      </div>
+      <div class="card"><div class="cardh"><div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="a-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="a-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lA()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('anc_visits',['visit_type','gestation_weeks','amount_charged','patient_ref','entry_date','entered_by'])">Export CSV</button>
+        </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Patient</th><th>Visit Type</th><th>Gestation</th><th>Amount (UGX)</th><th>By</th><th>Actions</th></tr></thead><tbody id="at"><tr><td colspan="7" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- FP -->
+    <div class="tc" id="tc-fp">
+      <div class="sh"><div class="stit">F/P — Family Planning</div><div class="sdesc">Record family planning services</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#7b5ea7"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="f-dt"/></div>
+          <div class="fgg"><label>Patient Ref</label><input type="text" id="f-pt" placeholder="Optional"/></div>
+          <div class="fgg"><label>FP Method</label><select id="f-mt"><option value="">Select method...</option><option>Oral Contraceptives</option><option>Injectable (Depo)</option><option>Implant</option><option>IUD / IUCD</option><option>Condoms</option><option>Emergency Contraception</option><option>Natural Family Planning</option><option>Other</option></select></div>
+          <div class="fgg"><label>Amount Charged (UGX)</label><input type="number" id="f-am" placeholder="0"/></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('f')">Clear</button><button class="btn btn-p" id="f-sub" onclick="subF()">Add Entry</button></div></div>
+      </div>
+      <div class="card"><div class="cardh"><div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="f-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="f-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lF()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('fp_visits',['method','amount_charged','patient_ref','entry_date','entered_by'])">Export CSV</button>
+        </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Patient</th><th>Method</th><th>Amount (UGX)</th><th>By</th><th>Actions</th></tr></thead><tbody id="ft"><tr><td colspan="6" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- EXPENDITURE -->
+    <div class="tc" id="tc-exp">
+      <div class="sh"><div class="stit">Expenditure</div><div class="sdesc">Record clinic expenses</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#c0392b"></span>New Entry</div></div>
+        <div class="cardb"><div class="fg" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="e-dt"/></div>
+          <div class="fgg"><label>Category</label><select id="e-ct"><option value="">Select...</option><option>Salary / Wages</option><option>Drug Supplies</option><option>Lab Supplies</option><option>Utilities</option><option>Rent</option><option>Equipment</option><option>Stationery</option><option>Transport</option><option>Maintenance</option><option>Other</option></select></div>
+          <div class="fgg"><label>Amount (UGX)</label><input type="number" id="e-am" placeholder="0"/></div>
+          <div class="fgg s2"><label>Description</label><textarea id="e-ds" placeholder="Brief description..."></textarea></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('e')">Clear</button><button class="btn btn-p" id="e-sub" onclick="subE()">Add Entry</button></div></div>
+      </div>
+      <div class="card"><div class="cardh"><div class="cardht">Records</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="e-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="e-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lE()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('expenditure',['category','description','amount','entry_date','entered_by'])">Export CSV</button>
+        </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount (UGX)</th><th>By</th><th>Actions</th></tr></thead><tbody id="et"><tr><td colspan="6" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- STOCK -->
+    <div class="tc" id="tc-stock">
+      <div class="sh"><div class="stit">Stock Management</div><div class="sdesc">Track medicines purchased and dispensed — see remaining stock</div></div>
+      <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#6b7a2a"></span>Record Movement</div></div>
+        <div class="cardb"><div class="fg3" style="margin-bottom:12px">
+          <div class="fgg"><label>Date</label><input type="date" id="st-dt"/></div>
+          <div class="fgg"><label>Type</label><select id="st-tp"><option value="in">Stock In (Purchased)</option><option value="out">Stock Out (Dispensed)</option></select></div>
+          <div class="fgg"><label>Drug Name</label><input type="text" id="st-nm" placeholder="e.g. Paracetamol 500mg"/></div>
+          <div class="fgg"><label>Quantity</label><input type="number" id="st-qt" placeholder="0" min="1"/></div>
+          <div class="fgg"><label>Unit Cost (UGX)</label><input type="number" id="st-uc" placeholder="0 (for Stock In)"/></div>
+          <div class="fgg"><label>Supplier</label><input type="text" id="st-sp" placeholder="For Stock In only"/></div>
+          <div class="fgg s3"><label>Notes</label><input type="text" id="st-nt" placeholder="Optional notes"/></div>
+        </div><div class="br"><button class="btn btn-s" onclick="cf('st')">Clear</button><button class="btn btn-p" id="st-sub" onclick="subSt()">Record</button></div></div>
+      </div>
+      <div class="card" id="stock-summary-card"><div class="cardh"><div class="cardht">Stock Balance by Drug</div><button class="fbtn fbtn-p" onclick="loadStockSummary()" style="font-size:12px;padding:5px 12px">Refresh</button></div>
+        <div class="cardb"><div id="stock-grid-con" class="stock-grid"></div></div>
+      </div>
+      <div class="card"><div class="cardh"><div class="cardht">Movement History</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <input type="date" id="st-f1" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <span style="font-size:12px;color:var(--muted)">to</span>
+          <input type="date" id="st-f2" style="padding:5px 9px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:#fff"/>
+          <button class="fbtn fbtn-p" onclick="lSt()">Filter</button>
+          <button class="fbtn fbtn-g" onclick="expCSV('stock_movements',['movement_type','drug_name','quantity','unit_cost','supplier','entry_date','entered_by'])">Export CSV</button>
+        </div>
+      </div>
+      <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Type</th><th>Drug</th><th>Qty</th><th>Unit Cost</th><th>Supplier</th><th>By</th><th>Actions</th></tr></thead><tbody id="stt"><tr><td colspan="8" class="es">No entries</td></tr></tbody></table></div></div></div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="tc" id="tc-sum">
+      <div class="sh"><div class="stit">Daily Summary</div><div class="sdesc">Revenue, expenditure and net income overview</div></div>
+      <div class="fbar">
+        <label>From</label><input type="date" id="sm-f1"/>
+        <label>To</label><input type="date" id="sm-f2"/>
+        <button class="fbtn fbtn-p" onclick="loadSum()">Load</button>
+        <button class="fbtn fbtn-g" onclick="expSumCSV()">Export CSV</button>
+      </div>
+      <div id="sum-con"></div>
+    </div>
+
+    <!-- AUDIT -->
+    <div class="tc" id="tc-audit">
+      <div class="sh"><div class="stit">Audit Log</div><div class="sdesc">All entries across all modules — who entered what and when</div></div>
+      <div class="fbar">
+        <label>From</label><input type="date" id="au-f1"/>
+        <label>To</label><input type="date" id="au-f2"/>
+        <button class="fbtn fbtn-p" onclick="loadAudit()">Load</button>
+      </div>
+      <div id="aud-con"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="tc" id="tc-users">
+      <div class="sh"><div class="stit">User Management</div><div class="sdesc">Create and manage staff accounts — superadmin only</div></div>
+      <div class="card"><div class="cardh"><div class="cardht">All Users</div>
+        <button class="fbtn fbtn-p" onclick="openAddUser()">+ Add User</button>
+      </div>
+      <div class="cardb"><div id="users-list">Loading...</div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div class="modal-bg" id="modal-user">
+  <div class="modal">
+    <div class="modal-title">Add New User <button class="modal-close" onclick="closeModal()">✕</button></div>
+    <div class="mfg"><label>Full Name</label><input type="text" id="m-name" placeholder="e.g. Nurse Sarah"/></div>
+    <div class="mfg"><label>Email</label><input type="email" id="m-email" placeholder="email@hopeclinic.com"/></div>
+    <div class="mfg"><label>Password</label><input type="password" id="m-pass" placeholder="Min 6 characters"/></div>
+    <div class="mfg"><label>Role</label>
+      <select id="m-role" onchange="toggleModules()">
+        <option value="staff">Staff</option>
+        <option value="admin">Admin</option>
+        <option value="superadmin">Super Admin</option>
+      </select>
+    </div>
+    <div class="mfg" id="m-mods-wrap">
+      <label>Assigned Modules</label>
+      <div class="mod-check-grid">
+        <label class="mod-check"><input type="checkbox" value="drugs"/> Retail Drugs</label>
+        <label class="mod-check"><input type="checkbox" value="lab"/> Laboratory</label>
+        <label class="mod-check"><input type="checkbox" value="rx"/> RX Treatment</label>
+        <label class="mod-check"><input type="checkbox" value="anc"/> ANC</label>
+        <label class="mod-check"><input type="checkbox" value="fp"/> Family Planning</label>
+        <label class="mod-check"><input type="checkbox" value="expenditure"/> Expenditure</label>
+        <label class="mod-check"><input type="checkbox" value="stock"/> Stock</label>
       </div>
     </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Drug</th><th>Qty</th><th>Unit Price</th><th>Total</th><th></th></tr></thead>
-            <tbody id="drugs-table"><tr><td colspan="5" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
+    <div class="br" style="margin-top:16px">
+      <button class="btn btn-s" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-p" id="m-save" onclick="saveUser()">Create User</button>
     </div>
   </div>
-
-  <!-- LAB -->
-  <div class="tab-content" id="content-lab">
-    <div class="section-header">
-      <div class="section-title">Laboratory</div>
-      <div class="section-desc">Record test results and fees charged</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="tab-dot" style="background:#4a90d9"></span><span class="card-title">New Entry</span></div>
-      <div class="card-body">
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="lab-date"/>
-          </div>
-          <div class="form-group">
-            <label>Patient Ref / Name</label>
-            <input type="text" id="lab-patient" placeholder="Optional"/>
-          </div>
-          <div class="form-group">
-            <label>Test Name</label>
-            <input type="text" id="lab-test" placeholder="e.g. Malaria RDT, Full Blood Count"/>
-          </div>
-          <div class="form-group">
-            <label>Fee Charged (UGX)</label>
-            <input type="number" id="lab-fee" placeholder="0" min="0"/>
-          </div>
-          <div class="form-group span2">
-            <label>Result</label>
-            <input type="text" id="lab-result" placeholder="e.g. Positive, Negative, 12.5 g/dL"/>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('lab')">Clear</button>
-          <button class="btn btn-primary" id="lab-submit" onclick="submitLab()">Add Entry</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Patient</th><th>Test</th><th>Result</th><th>Fee (UGX)</th><th></th></tr></thead>
-            <tbody id="lab-table"><tr><td colspan="5" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RX -->
-  <div class="tab-content" id="content-rx">
-    <div class="section-header">
-      <div class="section-title">RX — Treatment</div>
-      <div class="section-desc">Record patient treatments and consultation fees</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="tab-dot" style="background:#e07b2a"></span><span class="card-title">New Entry</span></div>
-      <div class="card-body">
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="rx-date"/>
-          </div>
-          <div class="form-group">
-            <label>Patient Ref / Name</label>
-            <input type="text" id="rx-patient" placeholder="Optional"/>
-          </div>
-          <div class="form-group span2">
-            <label>Diagnosis</label>
-            <input type="text" id="rx-diagnosis" placeholder="e.g. Malaria, UTI, Hypertension"/>
-          </div>
-          <div class="form-group span2">
-            <label>Treatment Given</label>
-            <textarea id="rx-treatment" placeholder="e.g. Artemether/Lumefantrine 6-dose, ORS..."></textarea>
-          </div>
-          <div class="form-group">
-            <label>Amount Charged (UGX)</label>
-            <input type="number" id="rx-amount" placeholder="0" min="0"/>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('rx')">Clear</button>
-          <button class="btn btn-primary" id="rx-submit" onclick="submitRx()">Add Entry</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Patient</th><th>Diagnosis</th><th>Treatment</th><th>Amount (UGX)</th><th></th></tr></thead>
-            <tbody id="rx-table"><tr><td colspan="5" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ANC -->
-  <div class="tab-content" id="content-anc">
-    <div class="section-header">
-      <div class="section-title">ANC — Antenatal Care</div>
-      <div class="section-desc">Record antenatal visits and services</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="tab-dot" style="background:#c45ca0"></span><span class="card-title">New Entry</span></div>
-      <div class="card-body">
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="anc-date"/>
-          </div>
-          <div class="form-group">
-            <label>Patient Ref / Name</label>
-            <input type="text" id="anc-patient" placeholder="Optional"/>
-          </div>
-          <div class="form-group">
-            <label>Visit Type</label>
-            <select id="anc-visit">
-              <option value="">Select visit type...</option>
-              <option>1st ANC Visit</option>
-              <option>2nd ANC Visit</option>
-              <option>3rd ANC Visit</option>
-              <option>4th ANC Visit</option>
-              <option>Follow-up</option>
-              <option>Delivery</option>
-              <option>Postnatal</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Gestation (weeks)</label>
-            <input type="number" id="anc-gestation" placeholder="e.g. 28" min="4" max="42"/>
-          </div>
-          <div class="form-group">
-            <label>Amount Charged (UGX)</label>
-            <input type="number" id="anc-amount" placeholder="0" min="0"/>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('anc')">Clear</button>
-          <button class="btn btn-primary" id="anc-submit" onclick="submitAnc()">Add Entry</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Patient</th><th>Visit Type</th><th>Gestation</th><th>Amount (UGX)</th><th></th></tr></thead>
-            <tbody id="anc-table"><tr><td colspan="5" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- F/P -->
-  <div class="tab-content" id="content-fp">
-    <div class="section-header">
-      <div class="section-title">F/P — Family Planning</div>
-      <div class="section-desc">Record family planning services provided</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="tab-dot" style="background:#7b5ea7"></span><span class="card-title">New Entry</span></div>
-      <div class="card-body">
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="fp-date"/>
-          </div>
-          <div class="form-group">
-            <label>Patient Ref / Name</label>
-            <input type="text" id="fp-patient" placeholder="Optional"/>
-          </div>
-          <div class="form-group">
-            <label>FP Method</label>
-            <select id="fp-method">
-              <option value="">Select method...</option>
-              <option>Oral Contraceptives</option>
-              <option>Injectable (Depo)</option>
-              <option>Implant</option>
-              <option>IUD / IUCD</option>
-              <option>Condoms</option>
-              <option>Emergency Contraception</option>
-              <option>Natural Family Planning</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Amount Charged (UGX)</label>
-            <input type="number" id="fp-amount" placeholder="0" min="0"/>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('fp')">Clear</button>
-          <button class="btn btn-primary" id="fp-submit" onclick="submitFp()">Add Entry</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Patient</th><th>Method</th><th>Amount (UGX)</th><th></th></tr></thead>
-            <tbody id="fp-table"><tr><td colspan="4" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- EXPENDITURE -->
-  <div class="tab-content" id="content-expenditure">
-    <div class="section-header">
-      <div class="section-title">Expenditure</div>
-      <div class="section-desc">Record clinic expenses by category</div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="tab-dot" style="background:#d63b3b"></span><span class="card-title">New Entry</span></div>
-      <div class="card-body">
-        <div class="form-grid" style="margin-bottom:14px">
-          <div class="form-group">
-            <label>Entry Date</label>
-            <input type="date" id="exp-date"/>
-          </div>
-          <div class="form-group">
-            <label>Category</label>
-            <select id="exp-category">
-              <option value="">Select category...</option>
-              <option>Salary / Wages</option>
-              <option>Drug Supplies</option>
-              <option>Lab Supplies</option>
-              <option>Utilities (Electricity / Water)</option>
-              <option>Rent</option>
-              <option>Equipment</option>
-              <option>Stationery</option>
-              <option>Transport</option>
-              <option>Maintenance</option>
-              <option>Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Amount (UGX)</label>
-            <input type="number" id="exp-amount" placeholder="0" min="0"/>
-          </div>
-          <div class="form-group span2">
-            <label>Description</label>
-            <textarea id="exp-desc" placeholder="Brief description of what was spent on..."></textarea>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="btn btn-secondary" onclick="clearForm('exp')">Clear</button>
-          <button class="btn btn-primary" id="exp-submit" onclick="submitExp()">Add Entry</button>
-        </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-header"><span class="card-title">Today's Entries</span></div>
-      <div class="card-body" style="padding:0">
-        <div class="records-wrap">
-          <table>
-            <thead><tr><th>Category</th><th>Description</th><th>Amount (UGX)</th><th></th></tr></thead>
-            <tbody id="exp-table"><tr><td colspan="4" class="empty-state">No entries yet today</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DAILY SUMMARY -->
-  <div class="tab-content" id="content-summary">
-    <div class="section-header">
-      <div class="section-title">Daily Summary</div>
-      <div class="section-desc">Revenue and expenditure overview for today</div>
-    </div>
-    <div id="summary-content">
-      <div class="card" style="padding:32px; text-align:center; color:var(--muted)">Loading summary...</div>
-    </div>
-  </div>
-
 </div>
 
 <div id="toast"></div>
 
 <script>
-const SUPABASE_URL = 'https://xnhagcrtqoukgzlqxymn.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuaGFnY3J0cW91a2d6bHF4eW1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMzMjYsImV4cCI6MjA5MTMzOTMyNn0.LzD0hSX4OnLDY7E5ByLybWaj0OUoO0nQQrw9Cga_eGI';
-const today = new Date().toISOString().split('T')[0];
+const SB='https://xnhagcrtqoukgzlqxymn.supabase.co';
+const SK='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhuaGFnY3J0cW91a2d6bHF4eW1uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3NjMzMjYsImV4cCI6MjA5MTMzOTMyNn0.LzD0hSX4OnLDY7E5ByLybWaj0OUoO0nQQrw9Cga_eGI';
+const SK_SERVICE=''; // set service role key here if needed for user creation
+let CU=null,CR='staff',AT=null,MODS=[],UPROFILE=null;
+const td=new Date().toISOString().split('T')[0];
+const ALL_MODS=['drugs','lab','rx','anc','fp','expenditure','stock'];
 
-// Init
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('header-date').textContent = new Date().toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
-  ['drugs-date','lab-date','rx-date','anc-date','fp-date','exp-date'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.value = today;
+// ── AUTH ──
+async function doLogin(){
+  const em=document.getElementById('le').value.trim(),pw=document.getElementById('lp').value;
+  const err=document.getElementById('lerr'),btn=document.getElementById('lbtn');
+  err.style.display='none';
+  if(!em||!pw){err.textContent='Please enter email and password.';err.style.display='block';return;}
+  btn.innerHTML='<span class="spin"></span>Signing in...';btn.disabled=true;
+  try{
+    const res=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SK},body:JSON.stringify({email:em,password:pw})});
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error_description||'Login failed');
+    AT=data.access_token;CU=data.user;
+    // Load profile
+    const pres=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${CU.id}`,{headers:gh()});
+    const pdata=await pres.json();
+    if(!pdata.length)throw new Error('No profile found. Contact administrator.');
+    UPROFILE=pdata[0];
+    CR=UPROFILE.role;
+    MODS=UPROFILE.assigned_modules||[];
+    if(!UPROFILE.is_active)throw new Error('Your account is inactive. Contact administrator.');
+    onLogin();
+  }catch(e){err.textContent=e.message==='Invalid login credentials'?'Incorrect email or password.':e.message;err.style.display='block';}
+  btn.innerHTML='Sign In';btn.disabled=false;
+}
+
+function onLogin(){
+  document.getElementById('pg-login').style.display='none';
+  document.getElementById('pg-app').style.display='block';
+  const name=UPROFILE.full_name||'User';
+  document.getElementById('uname').textContent=name;
+  document.getElementById('uav').textContent=name.charAt(0).toUpperCase();
+  const b=document.getElementById('rbadge');
+  const labels={superadmin:'Super Admin',admin:'Admin',staff:'Staff'};
+  const cls={superadmin:'rb-sa',admin:'rb-a',staff:'rb-s'};
+  b.textContent=labels[CR]||CR;b.className='rbadge '+cls[CR];
+  document.getElementById('hdate').textContent=new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+  // Show tabs based on role & modules
+  buildTabs();
+  // Set default dates
+  ALL_MODS.forEach(m=>{
+    const f1=document.getElementById(m[0]+'-f1')||document.getElementById('st-f1');
+    const f2=document.getElementById(m[0]+'-f2')||document.getElementById('st-f2');
   });
-  const saved = localStorage.getItem('clinic_staff');
-  if(saved) document.getElementById('global-staff').value = saved;
-  loadTodayEntries();
-});
-
-function getStaff() { return document.getElementById('global-staff').value.trim() || 'Staff'; }
-
-// Tab switching
-function switchTab(name) {
-  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-  document.getElementById('content-' + name).classList.add('active');
-  document.getElementById('tab-' + name).classList.add('active');
-  if(name === 'summary') loadSummary();
+  ['d-dt','l-dt','r-dt','a-dt','f-dt','e-dt','st-dt'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=td;});
+  // Set filter defaults to current month
+  const m1=td.substring(0,7)+'-01';
+  ['d-f1','l-f1','r-f1','a-f1','f-f1','e-f1','st-f1','sm-f1','au-f1'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=m1;});
+  ['d-f2','l-f2','r-f2','a-f2','f-f2','e-f2','st-f2','sm-f2','au-f2'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=td;});
+  // Load first visible tab data
+  loadAll();
+  loadStockSummary();
 }
 
-// Toast
-function showToast(msg, isError = false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = isError ? 'error' : '';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3200);
+function buildTabs(){
+  const isAdmin=CR==='admin'||CR==='superadmin';
+  const isSA=CR==='superadmin';
+  // Staff: show only assigned modules
+  if(CR==='staff'){
+    ALL_MODS.forEach(m=>{
+      const btn=document.getElementById('tb-'+m);
+      if(btn)btn.style.display=MODS.includes(m)?'flex':'none';
+    });
+  }
+  if(isAdmin){
+    document.getElementById('tb-sum').style.display='flex';
+    document.getElementById('tb-audit').style.display='flex';
+    ALL_MODS.forEach(m=>{const btn=document.getElementById('tb-'+m);if(btn)btn.style.display='flex';});
+  }
+  if(isSA){document.getElementById('tb-users').style.display='flex';}
+  // Activate first visible tab
+  const firstVisible=document.querySelector('.tbtn:not([style*="display: none"])');
+  if(firstVisible){
+    const id=firstVisible.id.replace('tb-','');
+    sw(id,true);
+  }
 }
 
-// Supabase helpers
-async function dbInsert(table, data) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=representation'
-    },
-    body: JSON.stringify(data)
+function doLogout(){AT=null;CU=null;CR='staff';MODS=[];UPROFILE=null;document.getElementById('pg-app').style.display='none';document.getElementById('pg-login').style.display='flex';document.getElementById('lp').value='';document.getElementById('lerr').style.display='none';}
+
+// ── TABS ──
+function sw(n,silent=false){
+  document.querySelectorAll('.tc').forEach(e=>e.classList.remove('active'));
+  document.querySelectorAll('.tbtn').forEach(e=>e.classList.remove('active'));
+  const tc=document.getElementById('tc-'+n);
+  const tb=document.getElementById('tb-'+n);
+  if(tc)tc.classList.add('active');
+  if(tb)tb.classList.add('active');
+  if(!silent){
+    if(n==='sum')loadSum();
+    if(n==='audit')loadAudit();
+    if(n==='users')loadUsers();
+    if(n==='stock')loadStockSummary();
+  }
+}
+
+// ── HELPERS ──
+function gh(){return{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+(AT||SK)};}
+function toast(m,err=false){const t=document.getElementById('toast');t.textContent=m;t.className=err?'err show':'show';setTimeout(()=>t.className='',3200);}
+async function ins(tb,data){const r=await fetch(`${SB}/rest/v1/${tb}`,{method:'POST',headers:{...gh(),'Prefer':'return=representation'},body:JSON.stringify(data)});if(!r.ok){const e=await r.json();throw new Error(e.message||'Insert failed');}return r.json();}
+async function selRange(tb,f1,f2,df='entry_date'){
+  const d1=f1||td,d2=f2||td;
+  const r=await fetch(`${SB}/rest/v1/${tb}?${df}=gte.${d1}&${df}=lte.${d2}&order=created_at.desc`,{headers:gh()});
+  if(!r.ok)throw new Error('Fetch failed');return r.json();
+}
+async function delR(tb,id){const r=await fetch(`${SB}/rest/v1/${tb}?id=eq.${id}`,{method:'DELETE',headers:gh()});return r.ok;}
+function ld(id,on){const b=document.getElementById(id);if(!b)return;if(on){b.innerHTML='<span class="spin"></span>Saving...';b.disabled=true;}else{b.innerHTML='Add Entry';b.disabled=false;}}
+function fmt(n){return Number(n||0).toLocaleString('en-UG');}
+function gs(){return UPROFILE?.full_name||'Staff';}
+function gv(id){const el=document.getElementById(id);return el?el.value:'';}
+function getRange(pfx){return{f1:gv(pfx+'-f1')||td.substring(0,7)+'-01',f2:gv(pfx+'-f2')||td};}
+const canDel=()=>CR==='admin'||CR==='superadmin';
+
+// ── PDF RECEIPT ──
+function dlPDF(entry,module){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({unit:'mm',format:'a6'});
+  const teal=[26,122,110];
+  doc.setFillColor(...teal);doc.rect(0,0,105,18,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(13);doc.setFont(undefined,'bold');
+  doc.text('Hope Medical Clinic',6,8);
+  doc.setFontSize(7);doc.setFont(undefined,'normal');
+  doc.text('We care for you | Daily Records System',6,13);
+  doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont(undefined,'bold');
+  doc.text('RECEIPT',6,24);
+  doc.setFontSize(8);doc.setFont(undefined,'normal');
+  doc.setTextColor(90,90,90);
+  doc.text('Module: '+module.toUpperCase(),6,30);
+  doc.text('Date: '+entry.entry_date,6,36);
+  doc.text('Captured by: '+(entry.entered_by||'—'),6,42);
+  doc.text('Printed: '+new Date().toLocaleString('en-GB'),6,48);
+  doc.setDrawColor(...teal);doc.line(6,52,99,52);
+  doc.setTextColor(0,0,0);doc.setFontSize(8);
+  let y=58;
+  const fields=Object.entries(entry).filter(([k])=>!['id','created_at','entered_by_id'].includes(k));
+  fields.forEach(([k,v])=>{
+    if(v===null||v===undefined||v==='')return;
+    const lbl=k.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+    const val=typeof v==='number'?fmt(v):String(v);
+    doc.setFont(undefined,'bold');doc.text(lbl+':',6,y);
+    doc.setFont(undefined,'normal');doc.text(val,50,y);
+    y+=7;if(y>130){doc.addPage();y=20;}
   });
-  if(!res.ok) { const e = await res.json(); throw new Error(e.message || 'Insert failed'); }
-  return res.json();
+  // Amount highlight
+  const amtKey=Object.keys(entry).find(k=>k.includes('amount')||k.includes('total')||k===('amount'));
+  if(amtKey&&entry[amtKey]){
+    y+=3;doc.setFillColor(...teal);doc.roundedRect(6,y,93,10,2,2,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont(undefined,'bold');
+    doc.text('Total: UGX '+fmt(entry[amtKey]),10,y+7);
+    y+=16;
+  }
+  doc.setTextColor(120,120,120);doc.setFontSize(7);
+  doc.text('Thank you for choosing Hope Medical Clinic',52,y+4,{align:'center'});
+  doc.save(`receipt_${module}_${entry.entry_date}.pdf`);
 }
 
-async function dbSelect(table, dateField = 'entry_date') {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${dateField}=eq.${today}&order=created_at.asc`, {
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-  });
-  if(!res.ok) throw new Error('Fetch failed');
-  return res.json();
+// ── CSV EXPORT ──
+async function expCSV(table,fields){
+  try{
+    const r=await fetch(`${SB}/rest/v1/${table}?order=entry_date.desc`,{headers:gh()});
+    const data=await r.json();
+    if(!data.length){toast('No data to export',true);return;}
+    const header=fields.join(',');
+    const rows=data.map(row=>fields.map(f=>{const v=row[f];return typeof v==='string'&&v.includes(',')?`"${v}"`:v??'';}).join(','));
+    const csv=[header,...rows].join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${table}_export_${td}.csv`;a.click();
+    toast('✓ CSV downloaded');
+  }catch(e){toast('Export failed: '+e.message,true);}
 }
 
-async function dbDelete(table, id) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: 'DELETE',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-  });
-  return res.ok;
+// ── DRUGS ──
+function cDT(){const q=parseFloat(gv('d-qt'))||0,p=parseFloat(gv('d-pr'))||0;document.getElementById('d-tot').textContent=fmt(q*p);}
+async function subD(){
+  const nm=gv('d-nm').trim(),qt=parseInt(gv('d-qt')),pr=parseFloat(gv('d-pr')),dt=gv('d-dt');
+  if(!nm||!qt||!pr||!dt){toast('Fill all fields',true);return;}
+  ld('d-sub',true);
+  try{const rows=await ins('retail_drugs',{drug_name:nm,quantity:qt,unit_price:pr,entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('d');lD();}catch(e){toast('Error: '+e.message,true);}
+  ld('d-sub',false);document.getElementById('d-sub').innerHTML='Add Entry';
+}
+async function lD(){
+  try{const {f1,f2}=getRange('d');const rows=await selRange('retail_drugs',f1,f2);const tb=document.getElementById('dt');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.drug_name}</td><td>${r.quantity}</td><td class="ac">${fmt(r.unit_price)}</td><td class="ac">${fmt(r.total_amount)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('retail_drugs','${r.id}',lD)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"drugs")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
 }
 
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if(loading) { btn.innerHTML = '<span class="spinner"></span>Saving...'; btn.disabled = true; }
-  else { btn.innerHTML = 'Add Entry'; btn.disabled = false; }
+// ── LAB ──
+async function subL(){
+  const tn=gv('l-tn').trim(),fe=parseFloat(gv('l-fe')),dt=gv('l-dt');
+  if(!tn||!fe||!dt){toast('Fill required fields',true);return;}
+  ld('l-sub',true);
+  try{await ins('lab_tests',{test_name:tn,fee_charged:fe,result:gv('l-rs').trim(),patient_ref:gv('l-pt').trim(),entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('l');lL();}catch(e){toast('Error: '+e.message,true);}
+  ld('l-sub',false);document.getElementById('l-sub').innerHTML='Add Entry';
+}
+async function lL(){
+  try{const {f1,f2}=getRange('l');const rows=await selRange('lab_tests',f1,f2);const tb=document.getElementById('lt');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.patient_ref||'—'}</td><td>${r.test_name}</td><td>${r.result||'—'}</td><td class="ac">${fmt(r.fee_charged)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('lab_tests','${r.id}',lL)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"lab")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
 }
 
-function fmt(n) { return Number(n || 0).toLocaleString('en-UG'); }
-
-// Drugs
-function calcDrugsTotal() {
-  const q = parseFloat(document.getElementById('drugs-qty').value) || 0;
-  const p = parseFloat(document.getElementById('drugs-price').value) || 0;
-  document.getElementById('drugs-total').textContent = fmt(q * p);
+// ── RX ──
+async function subR(){
+  const tr=gv('r-tr').trim(),am=parseFloat(gv('r-am')),dt=gv('r-dt');
+  if(!tr||!am||!dt){toast('Fill required fields',true);return;}
+  ld('r-sub',true);
+  try{await ins('rx_treatments',{treatment_given:tr,diagnosis:gv('r-dg').trim(),amount_charged:am,patient_ref:gv('r-pt').trim(),entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('r');lR();}catch(e){toast('Error: '+e.message,true);}
+  ld('r-sub',false);document.getElementById('r-sub').innerHTML='Add Entry';
+}
+async function lR(){
+  try{const {f1,f2}=getRange('r');const rows=await selRange('rx_treatments',f1,f2);const tb=document.getElementById('rt');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.patient_ref||'—'}</td><td>${r.diagnosis||'—'}</td><td style="font-size:12px;max-width:140px">${r.treatment_given}</td><td class="ac">${fmt(r.amount_charged)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('rx_treatments','${r.id}',lR)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"rx")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
 }
 
-async function submitDrugs() {
-  const name = document.getElementById('drugs-name').value.trim();
-  const qty = parseInt(document.getElementById('drugs-qty').value);
-  const price = parseFloat(document.getElementById('drugs-price').value);
-  const date = document.getElementById('drugs-date').value;
-  if(!name || !qty || !price || !date) { showToast('Please fill all required fields', true); return; }
-  setLoading('drugs-submit', true);
-  try {
-    await dbInsert('retail_drugs', { drug_name: name, quantity: qty, unit_price: price, entry_date: date, entered_by: getStaff() });
-    showToast('✓ Drug entry saved');
-    clearForm('drugs');
-    loadDrugsTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('drugs-submit', false);
+// ── ANC ──
+async function subA(){
+  const vt=gv('a-vt'),am=parseFloat(gv('a-am')),dt=gv('a-dt');
+  if(!vt||!am||!dt){toast('Fill required fields',true);return;}
+  ld('a-sub',true);
+  try{await ins('anc_visits',{visit_type:vt,gestation_weeks:parseInt(gv('a-gs'))||null,amount_charged:am,patient_ref:gv('a-pt').trim(),entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('a');lA();}catch(e){toast('Error: '+e.message,true);}
+  ld('a-sub',false);document.getElementById('a-sub').innerHTML='Add Entry';
+}
+async function lA(){
+  try{const {f1,f2}=getRange('a');const rows=await selRange('anc_visits',f1,f2);const tb=document.getElementById('at');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="7" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.patient_ref||'—'}</td><td>${r.visit_type}</td><td>${r.gestation_weeks?r.gestation_weeks+' wks':'—'}</td><td class="ac">${fmt(r.amount_charged)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('anc_visits','${r.id}',lA)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"anc")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
 }
 
-async function loadDrugsTable() {
-  try {
-    const rows = await dbSelect('retail_drugs');
-    const tbody = document.getElementById('drugs-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.drug_name}</td>
-        <td>${r.quantity}</td>
-        <td class="amount-cell">${fmt(r.unit_price)}</td>
-        <td class="amount-cell">${fmt(r.total_amount)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('retail_drugs','${r.id}',loadDrugsTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
+// ── FP ──
+async function subF(){
+  const mt=gv('f-mt'),am=parseFloat(gv('f-am')),dt=gv('f-dt');
+  if(!mt||!am||!dt){toast('Fill required fields',true);return;}
+  ld('f-sub',true);
+  try{await ins('fp_visits',{method:mt,amount_charged:am,patient_ref:gv('f-pt').trim(),entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('f');lF();}catch(e){toast('Error: '+e.message,true);}
+  ld('f-sub',false);document.getElementById('f-sub').innerHTML='Add Entry';
+}
+async function lF(){
+  try{const {f1,f2}=getRange('f');const rows=await selRange('fp_visits',f1,f2);const tb=document.getElementById('ft');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="6" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.patient_ref||'—'}</td><td>${r.method}</td><td class="ac">${fmt(r.amount_charged)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('fp_visits','${r.id}',lF)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"fp")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
 }
 
-// Lab
-async function submitLab() {
-  const test = document.getElementById('lab-test').value.trim();
-  const fee = parseFloat(document.getElementById('lab-fee').value);
-  const date = document.getElementById('lab-date').value;
-  if(!test || !fee || !date) { showToast('Please fill required fields', true); return; }
-  setLoading('lab-submit', true);
-  try {
-    await dbInsert('lab_tests', {
-      test_name: test, fee_charged: fee,
-      result: document.getElementById('lab-result').value.trim(),
-      patient_ref: document.getElementById('lab-patient').value.trim(),
-      entry_date: date, entered_by: getStaff()
+// ── EXPENDITURE ──
+async function subE(){
+  const ct=gv('e-ct'),am=parseFloat(gv('e-am')),dt=gv('e-dt');
+  if(!ct||!am||!dt){toast('Fill required fields',true);return;}
+  ld('e-sub',true);
+  try{await ins('expenditure',{category:ct,amount:am,description:gv('e-ds').trim(),entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('e');lE();}catch(e){toast('Error: '+e.message,true);}
+  ld('e-sub',false);document.getElementById('e-sub').innerHTML='Add Entry';
+}
+async function lE(){
+  try{const {f1,f2}=getRange('e');const rows=await selRange('expenditure',f1,f2);const tb=document.getElementById('et');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="6" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td>${r.category}</td><td style="font-size:12px;color:var(--muted)">${r.description||'—'}</td><td class="ac-r">${fmt(r.amount)}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('expenditure','${r.id}',lE)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"expenditure")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
+}
+
+// ── STOCK ──
+async function subSt(){
+  const tp=gv('st-tp'),nm=gv('st-nm').trim(),qt=parseInt(gv('st-qt')),dt=gv('st-dt');
+  if(!tp||!nm||!qt||!dt){toast('Fill required fields',true);return;}
+  document.getElementById('st-sub').innerHTML='<span class="spin"></span>Saving...';document.getElementById('st-sub').disabled=true;
+  try{
+    await ins('stock_movements',{movement_type:tp,drug_name:nm,quantity:qt,unit_cost:parseFloat(gv('st-uc'))||null,supplier:gv('st-sp').trim()||null,notes:gv('st-nt').trim()||null,entry_date:dt,entered_by:gs()});
+    toast('✓ Stock movement recorded');cf('st');lSt();loadStockSummary();
+  }catch(e){toast('Error: '+e.message,true);}
+  document.getElementById('st-sub').innerHTML='Record';document.getElementById('st-sub').disabled=false;
+}
+async function lSt(){
+  try{const {f1,f2}=getRange('st');const rows=await selRange('stock_movements',f1,f2);const tb=document.getElementById('stt');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="8" class="es">No entries found</td></tr>';return;}
+  tb.innerHTML=rows.map(r=>`<tr><td>${r.entry_date}</td><td><span class="${r.movement_type==='in'?'badge-in':'badge-out'}">${r.movement_type==='in'?'IN':'OUT'}</span></td><td>${r.drug_name}</td><td>${r.quantity}</td><td class="ac">${r.unit_cost?fmt(r.unit_cost):'—'}</td><td>${r.supplier||'—'}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td style="display:flex;gap:4px">${canDel()?`<button class="btn-d" onclick="dE('stock_movements','${r.id}',lSt)">Del</button>`:''}<button class="btn-pdf" onclick='dlPDF(${JSON.stringify(r)},"stock")'>PDF</button></td></tr>`).join('');}catch(e){console.error(e);}
+}
+async function loadStockSummary(){
+  try{
+    const r=await fetch(`${SB}/rest/v1/stock_movements?order=drug_name.asc`,{headers:gh()});
+    const rows=await r.json();
+    const drugs={};
+    rows.forEach(r=>{
+      if(!drugs[r.drug_name])drugs[r.drug_name]={in:0,out:0,cost:r.unit_cost||0};
+      if(r.movement_type==='in')drugs[r.drug_name].in+=r.quantity;
+      else drugs[r.drug_name].out+=r.quantity;
+      if(r.unit_cost)drugs[r.drug_name].cost=r.unit_cost;
     });
-    showToast('✓ Lab entry saved');
-    clearForm('lab');
-    loadLabTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('lab-submit', false);
-}
-
-async function loadLabTable() {
-  try {
-    const rows = await dbSelect('lab_tests');
-    const tbody = document.getElementById('lab-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.patient_ref || '—'}</td>
-        <td>${r.test_name}</td>
-        <td>${r.result || '—'}</td>
-        <td class="amount-cell">${fmt(r.fee_charged)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('lab_tests','${r.id}',loadLabTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-// RX
-async function submitRx() {
-  const treatment = document.getElementById('rx-treatment').value.trim();
-  const amount = parseFloat(document.getElementById('rx-amount').value);
-  const date = document.getElementById('rx-date').value;
-  if(!treatment || !amount || !date) { showToast('Please fill required fields', true); return; }
-  setLoading('rx-submit', true);
-  try {
-    await dbInsert('rx_treatments', {
-      treatment_given: treatment,
-      diagnosis: document.getElementById('rx-diagnosis').value.trim(),
-      amount_charged: amount,
-      patient_ref: document.getElementById('rx-patient').value.trim(),
-      entry_date: date, entered_by: getStaff()
-    });
-    showToast('✓ RX entry saved');
-    clearForm('rx');
-    loadRxTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('rx-submit', false);
-}
-
-async function loadRxTable() {
-  try {
-    const rows = await dbSelect('rx_treatments');
-    const tbody = document.getElementById('rx-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.patient_ref || '—'}</td>
-        <td>${r.diagnosis || '—'}</td>
-        <td style="max-width:200px;font-size:12px">${r.treatment_given}</td>
-        <td class="amount-cell">${fmt(r.amount_charged)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('rx_treatments','${r.id}',loadRxTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-// ANC
-async function submitAnc() {
-  const visit = document.getElementById('anc-visit').value;
-  const amount = parseFloat(document.getElementById('anc-amount').value);
-  const date = document.getElementById('anc-date').value;
-  if(!visit || !amount || !date) { showToast('Please fill required fields', true); return; }
-  setLoading('anc-submit', true);
-  try {
-    await dbInsert('anc_visits', {
-      visit_type: visit,
-      gestation_weeks: parseInt(document.getElementById('anc-gestation').value) || null,
-      amount_charged: amount,
-      patient_ref: document.getElementById('anc-patient').value.trim(),
-      entry_date: date, entered_by: getStaff()
-    });
-    showToast('✓ ANC entry saved');
-    clearForm('anc');
-    loadAncTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('anc-submit', false);
-}
-
-async function loadAncTable() {
-  try {
-    const rows = await dbSelect('anc_visits');
-    const tbody = document.getElementById('anc-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.patient_ref || '—'}</td>
-        <td>${r.visit_type}</td>
-        <td>${r.gestation_weeks ? r.gestation_weeks + ' wks' : '—'}</td>
-        <td class="amount-cell">${fmt(r.amount_charged)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('anc_visits','${r.id}',loadAncTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-// FP
-async function submitFp() {
-  const method = document.getElementById('fp-method').value;
-  const amount = parseFloat(document.getElementById('fp-amount').value);
-  const date = document.getElementById('fp-date').value;
-  if(!method || !amount || !date) { showToast('Please fill required fields', true); return; }
-  setLoading('fp-submit', true);
-  try {
-    await dbInsert('fp_visits', {
-      method,
-      amount_charged: amount,
-      patient_ref: document.getElementById('fp-patient').value.trim(),
-      entry_date: date, entered_by: getStaff()
-    });
-    showToast('✓ F/P entry saved');
-    clearForm('fp');
-    loadFpTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('fp-submit', false);
-}
-
-async function loadFpTable() {
-  try {
-    const rows = await dbSelect('fp_visits');
-    const tbody = document.getElementById('fp-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.patient_ref || '—'}</td>
-        <td>${r.method}</td>
-        <td class="amount-cell">${fmt(r.amount_charged)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('fp_visits','${r.id}',loadFpTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-// Expenditure
-async function submitExp() {
-  const cat = document.getElementById('exp-category').value;
-  const amount = parseFloat(document.getElementById('exp-amount').value);
-  const date = document.getElementById('exp-date').value;
-  if(!cat || !amount || !date) { showToast('Please fill required fields', true); return; }
-  setLoading('exp-submit', true);
-  try {
-    await dbInsert('expenditure', {
-      category: cat,
-      amount,
-      description: document.getElementById('exp-desc').value.trim(),
-      entry_date: date, entered_by: getStaff()
-    });
-    showToast('✓ Expenditure saved');
-    clearForm('exp');
-    loadExpTable();
-  } catch(e) { showToast('Error: ' + e.message, true); }
-  setLoading('exp-submit', false);
-}
-
-async function loadExpTable() {
-  try {
-    const rows = await dbSelect('expenditure');
-    const tbody = document.getElementById('exp-table');
-    if(!rows.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No entries yet today</td></tr>'; return; }
-    tbody.innerHTML = rows.map(r => `
-      <tr>
-        <td>${r.category}</td>
-        <td style="font-size:12px;color:var(--muted)">${r.description || '—'}</td>
-        <td class="amount-cell">${fmt(r.amount)}</td>
-        <td><button class="btn-danger-sm" onclick="deleteEntry('expenditure','${r.id}',loadExpTable)">✕</button></td>
-      </tr>`).join('');
-  } catch(e) { console.error(e); }
-}
-
-// Delete
-async function deleteEntry(table, id, reload) {
-  if(!confirm('Delete this entry?')) return;
-  try {
-    await dbDelete(table, id);
-    showToast('Entry deleted');
-    reload();
-  } catch(e) { showToast('Delete failed', true); }
-}
-
-// Summary
-async function loadSummary() {
-  const container = document.getElementById('summary-content');
-  container.innerHTML = '<div class="card" style="padding:32px;text-align:center;color:var(--muted)">Loading...</div>';
-  try {
-    const [drugs, lab, rx, anc, fp, exp] = await Promise.all([
-      dbSelect('retail_drugs'), dbSelect('lab_tests'), dbSelect('rx_treatments'),
-      dbSelect('anc_visits'), dbSelect('fp_visits'), dbSelect('expenditure')
-    ]);
-    const drugsTotal = drugs.reduce((s,r) => s + Number(r.total_amount || 0), 0);
-    const labTotal = lab.reduce((s,r) => s + Number(r.fee_charged || 0), 0);
-    const rxTotal = rx.reduce((s,r) => s + Number(r.amount_charged || 0), 0);
-    const ancTotal = anc.reduce((s,r) => s + Number(r.amount_charged || 0), 0);
-    const fpTotal = fp.reduce((s,r) => s + Number(r.amount_charged || 0), 0);
-    const expTotal = exp.reduce((s,r) => s + Number(r.amount || 0), 0);
-    const totalRevenue = drugsTotal + labTotal + rxTotal + ancTotal + fpTotal;
-    const netIncome = totalRevenue - expTotal;
-
-    const dateStr = new Date().toLocaleDateString('en-GB', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
-
-    container.innerHTML = `
-      <div class="summary-bar">
-        <div class="summary-item"><div class="summary-label">Total Revenue</div><div class="summary-value">UGX ${fmt(totalRevenue)}</div></div>
-        <div class="summary-divider"></div>
-        <div class="summary-item"><div class="summary-label">Expenditure</div><div class="summary-value">UGX ${fmt(expTotal)}</div></div>
-        <div class="summary-divider"></div>
-        <div class="summary-item"><div class="summary-label">Net Income</div><div class="summary-value" style="color:${netIncome>=0?'#a8f0c8':'#ffb3b3'}">${netIncome>=0?'+':''}UGX ${fmt(netIncome)}</div></div>
-        <div style="margin-left:auto;font-size:12px;opacity:0.7">${dateStr}</div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">Revenue Breakdown</span></div>
-        <div class="card-body" style="padding:0">
-          <table>
-            <thead><tr><th>Module</th><th>Entries</th><th>Total (UGX)</th><th>% of Revenue</th></tr></thead>
-            <tbody>
-              ${[
-                ['Retail Drugs','#2da866', drugs.length, drugsTotal],
-                ['Laboratory','#4a90d9', lab.length, labTotal],
-                ['RX Treatment','#e07b2a', rx.length, rxTotal],
-                ['ANC','#c45ca0', anc.length, ancTotal],
-                ['Family Planning','#7b5ea7', fp.length, fpTotal],
-              ].map(([name, color, count, amt]) => `
-                <tr>
-                  <td><span style="display:inline-flex;align-items:center;gap:6px"><span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0"></span>${name}</span></td>
-                  <td>${count}</td>
-                  <td class="amount-cell">${fmt(amt)}</td>
-                  <td style="color:var(--muted);font-size:12px">${totalRevenue ? ((amt/totalRevenue)*100).toFixed(1) + '%' : '—'}</td>
-                </tr>`).join('')}
-              <tr style="font-weight:600;border-top:2px solid var(--border)">
-                <td>Total</td><td>${drugs.length+lab.length+rx.length+anc.length+fp.length}</td>
-                <td class="amount-cell">${fmt(totalRevenue)}</td><td>100%</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="card" style="margin-top:16px">
-        <div class="card-header"><span class="card-title">Expenditure Breakdown</span></div>
-        <div class="card-body" style="padding:0">
-          ${exp.length ? `<table>
-            <thead><tr><th>Category</th><th>Description</th><th>Amount (UGX)</th></tr></thead>
-            <tbody>
-              ${exp.map(r => `<tr><td>${r.category}</td><td style="font-size:12px;color:var(--muted)">${r.description||'—'}</td><td class="amount-cell" style="color:var(--danger)">${fmt(r.amount)}</td></tr>`).join('')}
-              <tr style="font-weight:600;border-top:2px solid var(--border)"><td>Total</td><td></td><td class="amount-cell" style="color:var(--danger)">${fmt(expTotal)}</td></tr>
-            </tbody>
-          </table>` : '<div class="empty-state" style="padding:24px">No expenditure recorded today</div>'}
-        </div>
+    const con=document.getElementById('stock-grid-con');
+    if(!Object.keys(drugs).length){con.innerHTML='<div style="color:var(--muted);font-size:13px;padding:12px">No stock data yet. Record stock movements above.</div>';return;}
+    con.innerHTML=Object.entries(drugs).map(([name,d])=>{
+      const rem=d.in-d.out;const pct=d.in?Math.max(0,Math.min(100,Math.round((rem/d.in)*100))):0;
+      const low=rem<=10;const col=low?'var(--danger)':pct>50?'#1a7a4a':'var(--orange)';
+      return`<div class="scard">
+        <div class="scard-name">${name}</div>
+        <div class="scard-row"><span class="scard-label">Purchased</span><span class="scard-val">${d.in}</span></div>
+        <div class="scard-row"><span class="scard-label">Dispensed</span><span class="scard-val">${d.out}</span></div>
+        <div class="scard-row"><span class="scard-label">Remaining</span><span class="scard-val ${low?'low':'ok'}">${rem} ${low?'⚠️':''}</span></div>
+        ${d.cost?`<div class="scard-row"><span class="scard-label">Unit Cost</span><span class="scard-val" style="font-size:11px">UGX ${fmt(d.cost)}</span></div>`:''}
+        <div class="scard-bar"><div class="scard-fill" style="width:${pct}%;background:${col}"></div></div>
       </div>`;
-  } catch(e) { container.innerHTML = `<div class="card" style="padding:32px;text-align:center;color:var(--danger)">Failed to load summary: ${e.message}</div>`; }
+    }).join('');
+  }catch(e){console.error(e);}
 }
 
-// Clear forms
-function clearForm(mod) {
-  const t = today;
-  if(mod==='drugs') { ['drugs-name','drugs-qty','drugs-price'].forEach(id=>document.getElementById(id).value=''); document.getElementById('drugs-total').textContent='0'; document.getElementById('drugs-date').value=t; }
-  if(mod==='lab') { ['lab-patient','lab-test','lab-fee','lab-result'].forEach(id=>document.getElementById(id).value=''); document.getElementById('lab-date').value=t; }
-  if(mod==='rx') { ['rx-patient','rx-diagnosis','rx-treatment','rx-amount'].forEach(id=>document.getElementById(id).value=''); document.getElementById('rx-date').value=t; }
-  if(mod==='anc') { ['anc-patient','anc-gestation','anc-amount'].forEach(id=>document.getElementById(id).value=''); document.getElementById('anc-visit').value=''; document.getElementById('anc-date').value=t; }
-  if(mod==='fp') { ['fp-patient','fp-amount'].forEach(id=>document.getElementById(id).value=''); document.getElementById('fp-method').value=''; document.getElementById('fp-date').value=t; }
-  if(mod==='exp') { ['exp-amount','exp-desc'].forEach(id=>document.getElementById(id).value=''); document.getElementById('exp-category').value=''; document.getElementById('exp-date').value=t; }
+// ── DELETE ──
+async function dE(tb,id,rl){if(!canDel()){toast('No permission to delete',true);return;}if(!confirm('Delete this entry?'))return;try{await delR(tb,id);toast('Deleted');rl();}catch(e){toast('Delete failed',true);}}
+
+// ── SUMMARY ──
+async function loadSum(){
+  const f1=gv('sm-f1')||td.substring(0,7)+'-01',f2=gv('sm-f2')||td;
+  const c=document.getElementById('sum-con');
+  c.innerHTML='<div class="card" style="padding:28px;text-align:center;color:var(--muted)">Loading...</div>';
+  try{
+    const[dr,lb,rx,an,fp,ex]=await Promise.all([selRange('retail_drugs',f1,f2),selRange('lab_tests',f1,f2),selRange('rx_treatments',f1,f2),selRange('anc_visits',f1,f2),selRange('fp_visits',f1,f2),selRange('expenditure',f1,f2)]);
+    const dT=dr.reduce((s,r)=>s+Number(r.total_amount||0),0);
+    const lT=lb.reduce((s,r)=>s+Number(r.fee_charged||0),0);
+    const rT=rx.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const aT=an.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const fT=fp.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const eT=ex.reduce((s,r)=>s+Number(r.amount||0),0);
+    const tot=dT+lT+rT+aT+fT,net=tot-eT;
+    c.innerHTML=`
+    <div class="sbar">
+      <div class="si"><div class="sl">Revenue</div><div class="sv">UGX ${fmt(tot)}</div></div>
+      <div class="sdv"></div>
+      <div class="si"><div class="sl">Expenditure</div><div class="sv">UGX ${fmt(eT)}</div></div>
+      <div class="sdv"></div>
+      <div class="si"><div class="sl">Net Income</div><div class="sv ${net>=0?'snp':'snn'}">${net>=0?'+':''}UGX ${fmt(net)}</div></div>
+      <div style="margin-left:auto;font-size:11px;opacity:.75">${f1} → ${f2}</div>
+    </div>
+    <div class="card"><div class="cardh"><div class="cardht">Revenue by Module</div></div>
+    <div class="cardb" style="padding:0"><table><thead><tr><th>Module</th><th>Entries</th><th>Revenue (UGX)</th><th>Share</th></tr></thead><tbody>
+    ${[['Retail Drugs','#2da898',dr.length,dT],['Laboratory','#4a90d9',lb.length,lT],['RX Treatment','#d97b2a',rx.length,rT],['ANC','#c45ca0',an.length,aT],['Family Planning','#7b5ea7',fp.length,fT]]
+      .sort((a,b)=>b[3]-a[3])
+      .map(([n,cl,ct,a])=>`<tr><td><span style="display:inline-flex;align-items:center;gap:7px"><span style="width:8px;height:8px;border-radius:50%;background:${cl}"></span>${n}</span></td><td>${ct}</td><td class="ac">${fmt(a)}</td><td style="font-size:12px;color:var(--muted)">${tot?((a/tot)*100).toFixed(1)+'%':'—'}</td></tr>`).join('')}
+    <tr style="font-weight:600;border-top:2px solid var(--border)"><td>Total</td><td>${dr.length+lb.length+rx.length+an.length+fp.length}</td><td class="ac">${fmt(tot)}</td><td>100%</td></tr>
+    </tbody></table></div></div>
+    ${ex.length?`<div class="card" style="margin-top:14px"><div class="cardh"><div class="cardht">Expenditure Detail</div></div>
+    <div class="cardb" style="padding:0"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>By</th><th>Amount (UGX)</th></tr></thead><tbody>
+    ${ex.map(r=>`<tr><td>${r.entry_date}</td><td>${r.category}</td><td style="font-size:12px;color:var(--muted)">${r.description||'—'}</td><td><span class="chip">${r.entered_by||'—'}</span></td><td class="ac-r">${fmt(r.amount)}</td></tr>`).join('')}
+    <tr style="font-weight:600;border-top:2px solid var(--border)"><td colspan="4">Total</td><td class="ac-r">${fmt(eT)}</td></tr>
+    </tbody></table></div></div>`:''}`;
+  }catch(e){c.innerHTML=`<div class="card" style="padding:28px;text-align:center;color:var(--danger)">Error: ${e.message}</div>`;}
 }
 
-function loadTodayEntries() {
-  loadDrugsTable(); loadLabTable(); loadRxTable(); loadAncTable(); loadFpTable(); loadExpTable();
+async function expSumCSV(){
+  const f1=gv('sm-f1')||td.substring(0,7)+'-01',f2=gv('sm-f2')||td;
+  try{
+    const[dr,lb,rx,an,fp,ex]=await Promise.all([selRange('retail_drugs',f1,f2),selRange('lab_tests',f1,f2),selRange('rx_treatments',f1,f2),selRange('anc_visits',f1,f2),selRange('fp_visits',f1,f2),selRange('expenditure',f1,f2)]);
+    const rows=[['module','date','description','amount','entered_by'],
+      ...dr.map(r=>['Retail Drugs',r.entry_date,r.drug_name+' x'+r.quantity,r.total_amount,r.entered_by]),
+      ...lb.map(r=>['Lab',r.entry_date,r.test_name,r.fee_charged,r.entered_by]),
+      ...rx.map(r=>['RX',r.entry_date,r.diagnosis||r.treatment_given,r.amount_charged,r.entered_by]),
+      ...an.map(r=>['ANC',r.entry_date,r.visit_type,r.amount_charged,r.entered_by]),
+      ...fp.map(r=>['F/P',r.entry_date,r.method,r.amount_charged,r.entered_by]),
+      ...ex.map(r=>['Expenditure',r.entry_date,r.category+': '+(r.description||''),'-'+r.amount,r.entered_by]),
+    ];
+    const csv=rows.map(r=>r.map(v=>typeof v==='string'&&v.includes(',')?`"${v}"`:v??'').join(',')).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`hope_clinic_summary_${f1}_to_${f2}.csv`;a.click();
+    toast('✓ Summary exported');
+  }catch(e){toast('Export failed',true);}
 }
+
+// ── AUDIT ──
+async function loadAudit(){
+  const f1=gv('au-f1')||td.substring(0,7)+'-01',f2=gv('au-f2')||td;
+  const c=document.getElementById('aud-con');
+  c.innerHTML='<div class="card" style="padding:28px;text-align:center;color:var(--muted)">Loading audit log...</div>';
+  try{
+    const[dr,lb,rx,an,fp,ex,st]=await Promise.all([selRange('retail_drugs',f1,f2),selRange('lab_tests',f1,f2),selRange('rx_treatments',f1,f2),selRange('anc_visits',f1,f2),selRange('fp_visits',f1,f2),selRange('expenditure',f1,f2),selRange('stock_movements',f1,f2)]);
+    const all=[
+      ...dr.map(r=>({...r,_m:'Retail Drugs',_c:'at-d',_d:`${r.drug_name} ×${r.quantity}`,_a:r.total_amount})),
+      ...lb.map(r=>({...r,_m:'Lab',_c:'at-l',_d:`${r.test_name}${r.patient_ref?' — '+r.patient_ref:''}`,_a:r.fee_charged})),
+      ...rx.map(r=>({...r,_m:'RX',_c:'at-r',_d:`${r.diagnosis||'—'}${r.patient_ref?' — '+r.patient_ref:''}`,_a:r.amount_charged})),
+      ...an.map(r=>({...r,_m:'ANC',_c:'at-a',_d:`${r.visit_type}${r.patient_ref?' — '+r.patient_ref:''}`,_a:r.amount_charged})),
+      ...fp.map(r=>({...r,_m:'F/P',_c:'at-f',_d:`${r.method}${r.patient_ref?' — '+r.patient_ref:''}`,_a:r.amount_charged})),
+      ...ex.map(r=>({...r,_m:'Expenditure',_c:'at-e',_d:`${r.category}: ${r.description||''}`,_a:r.amount})),
+      ...st.map(r=>({...r,_m:'Stock '+(r.movement_type==='in'?'IN':'OUT'),_c:'at-st',_d:`${r.drug_name} ×${r.quantity}`,_a:r.unit_cost?r.quantity*(r.unit_cost):null})),
+    ].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+    if(!all.length){c.innerHTML='<div class="card" style="padding:28px;text-align:center;color:var(--muted)">No entries in this date range</div>';return;}
+    c.innerHTML=`<div class="card"><div class="cardh"><div class="cardht">${all.length} entries — ${f1} to ${f2}</div></div>
+    <div class="cardb" style="padding:0"><div class="rw"><table><thead><tr><th>Date</th><th>Time</th><th>Module</th><th>Details</th><th>Amount (UGX)</th><th>By</th></tr></thead><tbody>
+    ${all.map(r=>`<tr>
+      <td>${r.entry_date}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)">${new Date(r.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</td>
+      <td><span class="atag ${r._c}">${r._m}</span></td>
+      <td style="font-size:12px;max-width:180px">${r._d}</td>
+      <td class="${r._c==='at-e'?'ac-r':'ac'}">${r._a?fmt(r._a):'—'}</td>
+      <td><span class="chip">${r.entered_by||'—'}</span></td>
+    </tr>`).join('')}
+    </tbody></table></div></div></div>`;
+  }catch(e){c.innerHTML=`<div class="card" style="padding:28px;text-align:center;color:var(--danger)">Error: ${e.message}</div>`;}
+}
+
+// ── USERS ──
+async function loadUsers(){
+  const c=document.getElementById('users-list');c.innerHTML='Loading...';
+  try{
+    const r=await fetch(`${SB}/rest/v1/user_profiles?order=created_at.desc`,{headers:gh()});
+    const users=await r.json();
+    if(!users.length){c.innerHTML='<div style="color:var(--muted);font-size:13px">No users found.</div>';return;}
+    const roleCls={superadmin:'chip-sa',admin:'chip-a',staff:'chip-s'};
+    const roleLabel={superadmin:'Super Admin',admin:'Admin',staff:'Staff'};
+    c.innerHTML=users.map(u=>`
+      <div class="user-row">
+        <div class="user-info">
+          <div class="user-av">${u.full_name.charAt(0).toUpperCase()}</div>
+          <div>
+            <div class="user-name">${u.full_name} ${!u.is_active?'<span style="font-size:10px;color:var(--danger)">(Inactive)</span>':''}</div>
+            <div style="display:flex;gap:5px;margin-top:4px;flex-wrap:wrap">
+              <span class="chip ${roleCls[u.role]||'chip-s'}">${roleLabel[u.role]||u.role}</span>
+              ${(u.assigned_modules||[]).map(m=>`<span class="mod-tag">${m}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="user-actions">
+          <button class="fbtn fbtn-s" onclick="toggleActive('${u.id}','${u.full_name}',${u.is_active})" style="font-size:12px;padding:5px 10px">${u.is_active?'Deactivate':'Activate'}</button>
+        </div>
+      </div>`).join('');
+  }catch(e){c.innerHTML=`<div style="color:var(--danger);font-size:13px">Error: ${e.message}</div>`;}
+}
+
+async function toggleActive(id,name,current){
+  if(!confirm(`${current?'Deactivate':'Activate'} ${name}?`))return;
+  try{
+    await fetch(`${SB}/rest/v1/user_profiles?id=eq.${id}`,{method:'PATCH',headers:gh(),body:JSON.stringify({is_active:!current})});
+    toast(`✓ ${name} ${current?'deactivated':'activated'}`);loadUsers();
+  }catch(e){toast('Error: '+e.message,true);}
+}
+
+function toggleModules(){const role=gv('m-role');document.getElementById('m-mods-wrap').style.display=role==='staff'?'flex':'none';}
+function openAddUser(){document.getElementById('modal-user').classList.add('open');toggleModules();}
+function closeModal(){document.getElementById('modal-user').classList.remove('open');}
+
+async function saveUser(){
+  const name=gv('m-name').trim(),email=gv('m-email').trim(),pass=gv('m-pass').trim(),role=gv('m-role');
+  if(!name||!email||!pass||!role){toast('Fill all fields',true);return;}
+  if(pass.length<6){toast('Password must be at least 6 characters',true);return;}
+  const mods=role==='staff'?Array.from(document.querySelectorAll('#m-mods-wrap input:checked')).map(el=>el.value):ALL_MODS;
+  document.getElementById('m-save').innerHTML='<span class="spin"></span>Creating...';document.getElementById('m-save').disabled=true;
+  try{
+    // Insert via SQL through Supabase (using direct insert)
+    const res=await fetch(`${SB}/rest/v1/rpc/create_clinic_user`,{method:'POST',headers:gh(),body:JSON.stringify({p_email:email,p_password:pass,p_full_name:name,p_role:role,p_modules:mods})});
+    if(!res.ok){
+      // Fallback: show SQL to run manually
+      toast('Auto-create failed. See instructions below.',true);
+      document.getElementById('users-list').innerHTML+=`<div style="margin-top:16px;padding:14px;background:var(--olive-l);border-radius:8px;font-size:12px"><strong>Run this SQL in Supabase to create the user:</strong><pre style="margin-top:8px;font-size:11px;overflow-x:auto">INSERT INTO auth.users(id,instance_id,email,encrypted_password,email_confirmed_at,raw_user_meta_data,role,aud,created_at,updated_at)
+VALUES(gen_random_uuid(),'00000000-0000-0000-0000-000000000000',
+'${email}',crypt('${pass}',gen_salt('bf')),NOW(),
+'{"full_name":"${name}","role":"${role}"}'::jsonb,
+'authenticated','authenticated',NOW(),NOW());
+INSERT INTO user_profiles(id,full_name,role,assigned_modules)
+SELECT id,'${name}','${role}',ARRAY[${mods.map(m=>`'${m}'`).join(',')}]
+FROM auth.users WHERE email='${email}';</pre></div>`;
+    } else {
+      toast(`✓ ${name} created successfully`);closeModal();loadUsers();
+    }
+  }catch(e){toast('Error: '+e.message,true);}
+  document.getElementById('m-save').innerHTML='Create User';document.getElementById('m-save').disabled=false;
+}
+
+// ── CLEAR FORMS ──
+function cf(m){
+  const maps={
+    d:['d-nm','d-qt','d-pr'],l:['l-pt','l-tn','l-fe','l-rs'],
+    r:['r-pt','r-dg','r-tr','r-am'],a:['a-pt','a-gs','a-am'],
+    f:['f-pt','f-am'],e:['e-am','e-ds'],
+    st:['st-nm','st-qt','st-uc','st-sp','st-nt']
+  };
+  const sels={a:'a-vt',f:'f-mt',e:'e-ct'};
+  (maps[m]||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  if(sels[m])document.getElementById(sels[m]).value='';
+  const dtMap={d:'d-dt',l:'l-dt',r:'r-dt',a:'a-dt',f:'f-dt',e:'e-dt',st:'st-dt'};
+  if(dtMap[m])document.getElementById(dtMap[m]).value=td;
+  if(m==='d')document.getElementById('d-tot').textContent='0';
+}
+
+function loadAll(){lD();lL();lR();lA();lF();lE();lSt();}
 </script>
 </body>
 </html>
