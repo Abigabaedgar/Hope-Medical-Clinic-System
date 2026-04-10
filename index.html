@@ -6,6 +6,7 @@
 <title>Hope Medical Clinic</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root{
   --teal:#1a3f52;--teal-d:#0d2a38;--teal-l:#e2eef2;--teal-m:#2a7a90;
@@ -195,6 +196,26 @@ tr:hover td{background:var(--teal-l)}
   .hR .upill span:not(.uav){display:none}
   .stock-grid{grid-template-columns:1fr 1fr}
 }
+
+.dash-period-btn{padding:5px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--bg);color:var(--muted);font-family:"DM Sans",sans-serif;transition:all .18s}
+.dash-period-btn:hover{border-color:var(--teal-m);color:var(--teal)}
+.dash-period-btn.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+.kpi-card{background:#fff;border-radius:var(--r);border:1px solid var(--border);box-shadow:var(--sh);padding:18px 20px;display:flex;flex-direction:column;gap:6px}
+.kpi-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kpi-value{font-size:26px;font-weight:600;font-family:"DM Mono",monospace;letter-spacing:-.5px}
+.kpi-sub{font-size:11px;color:var(--muted)}
+.kpi-positive{color:#1a7a4a}.kpi-negative{color:var(--danger)}.kpi-teal{color:var(--teal)}.kpi-orange{color:var(--orange)}.kpi-olive{color:var(--olive)}
+.alert-row{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.alert-row:last-child{border-bottom:none}
+.alert-row.critical .alert-drug{color:var(--danger);font-weight:600}
+.alert-row.low .alert-drug{color:var(--orange);font-weight:500}
+.alert-qty{font-family:"DM Mono",monospace;font-size:12px}
+.act-row{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.act-row:last-child{border-bottom:none}
+.act-label{color:var(--text)}
+.act-val{font-family:"DM Mono",monospace;font-weight:500;color:var(--teal)}
+@media(max-width:600px){#dash-rev-chart-card,#dash-trend-card,.card+.card{grid-column:span 1}[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}}
+
 </style>
 </head>
 <body>
@@ -260,7 +281,8 @@ tr:hover td{background:var(--teal-l)}
   </header>
 
   <div class="tabbar" id="tabbar">
-    <button class="tbtn active" onclick="sw('drugs')" id="tb-drugs"><span class="tdot" style="background:#2da898"></span>Retail Drugs</button>
+        <button class="tbtn" onclick="sw('dash')" id="tb-dash"><span class="tdot" style="background:#1a3f52"></span>Dashboard</button>
+    <button class="tbtn" onclick="sw('drugs')" id="tb-drugs"><span class="tdot" style="background:#2da898"></span>Retail Drugs</button>
     <button class="tbtn" onclick="sw('lab')" id="tb-lab"><span class="tdot" style="background:#4a90d9"></span>Lab</button>
     <button class="tbtn" onclick="sw('rx')" id="tb-rx"><span class="tdot" style="background:#d97b2a"></span>RX</button>
     <button class="tbtn" onclick="sw('anc')" id="tb-anc"><span class="tdot" style="background:#c45ca0"></span>ANC</button>
@@ -273,6 +295,72 @@ tr:hover td{background:var(--teal-l)}
   </div>
 
   <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="tc" id="tc-dash">
+      <div class="sh"><div class="stit">Dashboard</div><div class="sdesc">System-wide summary — revenue, expenditure, stock and activity</div></div>
+
+      <!-- Date range picker -->
+      <div class="card" style="margin-bottom:18px">
+        <div class="cardb" style="padding:14px 18px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <label style="text-transform:none;font-size:13px;font-weight:500;color:var(--text)">Period</label>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="dash-period-btn active" onclick="setPeriod('today')">Today</button>
+              <button class="dash-period-btn" onclick="setPeriod('week')">This Week</button>
+              <button class="dash-period-btn" onclick="setPeriod('month')">This Month</button>
+              <button class="dash-period-btn" onclick="setPeriod('custom')">Custom</button>
+            </div>
+            <div id="dash-custom-range" style="display:none;align-items:center;gap:8px;flex-wrap:wrap">
+              <input type="date" id="dash-f1" style="padding:6px 10px;font-size:12px;border:1.5px solid var(--border);border-radius:7px;background:#fff"/>
+              <span style="font-size:12px;color:var(--muted)">to</span>
+              <input type="date" id="dash-f2" style="padding:6px 10px;font-size:12px;border:1.5px solid var(--border);border-radius:7px;background:#fff"/>
+              <button class="fbtn fbtn-p" onclick="loadDash()" style="font-size:12px;padding:6px 14px">Apply</button>
+            </div>
+            <div id="dash-period-label" style="font-size:12px;color:var(--muted);margin-left:auto"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div id="dash-kpis" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:18px"></div>
+
+      <!-- Charts row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+        <div class="card" id="dash-rev-chart-card">
+          <div class="cardh"><div class="cardht">Revenue by Module</div></div>
+          <div class="cardb"><canvas id="dash-rev-chart" height="220"></canvas></div>
+        </div>
+        <div class="card" id="dash-trend-card">
+          <div class="cardh"><div class="cardht">Daily Revenue Trend</div></div>
+          <div class="cardb"><canvas id="dash-trend-chart" height="220"></canvas></div>
+        </div>
+      </div>
+
+      <!-- Stock alerts + recent activity -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px">
+        <div class="card">
+          <div class="cardh"><div class="cardht">Stock Alerts</div><span id="dash-alert-count" style="font-size:11px;background:var(--danger-l);color:var(--danger);padding:2px 8px;border-radius:10px;font-weight:600"></span></div>
+          <div class="cardb" style="padding:0"><div id="dash-stock-alerts"></div></div>
+        </div>
+        <div class="card">
+          <div class="cardh"><div class="cardht">Top Drugs Dispensed</div></div>
+          <div class="cardb" style="padding:0"><div id="dash-top-drugs"></div></div>
+        </div>
+      </div>
+
+      <!-- Expenditure breakdown -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="cardh"><div class="cardht">Expenditure by Category</div></div>
+          <div class="cardb"><canvas id="dash-exp-chart" height="200"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="cardh"><div class="cardht">Activity Summary</div></div>
+          <div class="cardb" style="padding:0"><div id="dash-activity"></div></div>
+        </div>
+      </div>
+    </div>
 
     <!-- DRUGS -->
     <div class="tc active" id="tc-drugs">
@@ -588,12 +676,14 @@ function buildTabs(){
     });
   }
   if(isAdmin){
+    document.getElementById('tb-dash').style.display='flex';
     document.getElementById('tb-sum').style.display='flex';
     document.getElementById('tb-audit').style.display='flex';
     ALL_MODS.forEach(m=>{const btn=document.getElementById('tb-'+m);if(btn)btn.style.display='flex';});
   }
   if(isSA){document.getElementById('tb-users').style.display='flex';}
   // Activate first visible tab
+  if(CR==='admin'||CR==='superadmin'){sw('dash',true);setPeriod('month');return;}
   const firstVisible=document.querySelector('.tbtn:not([style*="display: none"])');
   if(firstVisible){
     const id=firstVisible.id.replace('tb-','');
@@ -612,7 +702,8 @@ function sw(n,silent=false){
   if(tc)tc.classList.add('active');
   if(tb)tb.classList.add('active');
   if(!silent){
-    if(n==='sum')loadSum();
+    if(n==='dash'){setPeriod('month');return;}
+  if(n==='sum')loadSum();
     if(n==='audit')loadAudit();
     if(n==='users')loadUsers();
     if(n==='stock')loadStockSummary();
@@ -995,6 +1086,143 @@ function cf(m){
   const dtMap={d:'d-dt',l:'l-dt',r:'r-dt',a:'a-dt',f:'f-dt',e:'e-dt',st:'st-dt'};
   if(dtMap[m])document.getElementById(dtMap[m]).value=td;
   if(m==='d')document.getElementById('d-tot').textContent='0';
+}
+
+
+// ── DASHBOARD ──
+let dashRevChart=null, dashTrendChart=null, dashExpChart=null;
+let dashF1=null, dashF2=null;
+
+function setPeriod(p){
+  document.querySelectorAll('.dash-period-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`.dash-period-btn[onclick="setPeriod('${p}')"]`);
+  if(btn)btn.classList.add('active');
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth(), d=now.getDate();
+  const pad=n=>String(n).padStart(2,'0');
+  const fmt=dt=>`${dt.getFullYear()}-${pad(dt.getMonth()+1)}-${pad(dt.getDate())}`;
+  const cr=document.getElementById('dash-custom-range');
+  if(p==='custom'){cr.style.display='flex';return;}
+  cr.style.display='none';
+  if(p==='today'){dashF1=dashF2=fmt(now);}
+  else if(p==='week'){const s=new Date(now);s.setDate(d-now.getDay());dashF1=fmt(s);dashF2=fmt(now);}
+  else if(p==='month'){dashF1=`${y}-${pad(m+1)}-01`;dashF2=fmt(now);}
+  document.getElementById('dash-period-label').textContent=dashF1===dashF2?dashF1:`${dashF1} → ${dashF2}`;
+  loadDash();
+}
+
+async function loadDash(){
+  const cf1=document.getElementById('dash-f1')?.value;
+  const cf2=document.getElementById('dash-f2')?.value;
+  if(cf1&&cf2){dashF1=cf1;dashF2=cf2;document.getElementById('dash-period-label').textContent=`${dashF1} → ${dashF2}`;}
+  if(!dashF1||!dashF2)return;
+  document.getElementById('dash-kpis').innerHTML=`<div style="grid-column:1/-1;text-align:center;color:var(--muted);font-size:13px;padding:20px">Loading dashboard...</div>`;
+  try{
+    const[dr,lb,rx,an,fp,ex,sm]=await Promise.all([
+      selRange('retail_drugs',dashF1,dashF2),selRange('lab_tests',dashF1,dashF2),
+      selRange('rx_treatments',dashF1,dashF2),selRange('anc_visits',dashF1,dashF2),
+      selRange('fp_visits',dashF1,dashF2),selRange('expenditure',dashF1,dashF2),
+      selRange('stock_movements',dashF1,dashF2)
+    ]);
+    const dT=dr.reduce((s,r)=>s+Number(r.total_amount||0),0);
+    const lT=lb.reduce((s,r)=>s+Number(r.fee_charged||0),0);
+    const rT=rx.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const aT=an.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const fT=fp.reduce((s,r)=>s+Number(r.amount_charged||0),0);
+    const eT=ex.reduce((s,r)=>s+Number(r.amount||0),0);
+    const tot=dT+lT+rT+aT+fT, net=tot-eT;
+    const totalPts=dr.length+lb.length+rx.length+an.length+fp.length;
+
+    // KPI Cards
+    document.getElementById('dash-kpis').innerHTML=`
+      <div class="kpi-card"><div class="kpi-label">Total Revenue</div><div class="kpi-value kpi-teal">UGX ${fmt(tot)}</div><div class="kpi-sub">${totalPts} patient entries</div></div>
+      <div class="kpi-card"><div class="kpi-label">Expenditure</div><div class="kpi-value kpi-negative">UGX ${fmt(eT)}</div><div class="kpi-sub">${ex.length} expense entries</div></div>
+      <div class="kpi-card"><div class="kpi-label">Net Income</div><div class="kpi-value ${net>=0?'kpi-positive':'kpi-negative'}">${net>=0?'+':''}UGX ${fmt(net)}</div><div class="kpi-sub">${net>=0?'Profit':'Loss'} for period</div></div>
+      <div class="kpi-card"><div class="kpi-label">Retail Drugs</div><div class="kpi-value kpi-teal">UGX ${fmt(dT)}</div><div class="kpi-sub">${dr.length} transactions</div></div>
+      <div class="kpi-card"><div class="kpi-label">Laboratory</div><div class="kpi-value kpi-teal">UGX ${fmt(lT)}</div><div class="kpi-sub">${lb.length} tests</div></div>
+      <div class="kpi-card"><div class="kpi-label">ANC + F/P</div><div class="kpi-value kpi-teal">UGX ${fmt(aT+fT)}</div><div class="kpi-sub">${an.length+fp.length} visits</div></div>
+    `;
+
+    // Revenue by module donut chart
+    const revCtx=document.getElementById('dash-rev-chart').getContext('2d');
+    if(dashRevChart)dashRevChart.destroy();
+    dashRevChart=new Chart(revCtx,{type:'doughnut',data:{
+      labels:['Retail Drugs','Laboratory','RX','ANC','Family Planning'],
+      datasets:[{data:[dT,lT,rT,aT,fT],backgroundColor:['#2a7a90','#4a90d9','#d97b2a','#c45ca0','#7b5ea7'],borderWidth:2,borderColor:'#fff'}]
+    },options:{responsive:true,plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:10}}},cutout:'62%'}});
+
+    // Daily trend line chart
+    const allEntries=[
+      ...dr.map(r=>({d:r.entry_date,a:Number(r.total_amount||0)})),
+      ...lb.map(r=>({d:r.entry_date,a:Number(r.fee_charged||0)})),
+      ...rx.map(r=>({d:r.entry_date,a:Number(r.amount_charged||0)})),
+      ...an.map(r=>({d:r.entry_date,a:Number(r.amount_charged||0)})),
+      ...fp.map(r=>({d:r.entry_date,a:Number(r.amount_charged||0)})),
+    ];
+    const dayMap={};
+    allEntries.forEach(e=>{dayMap[e.d]=(dayMap[e.d]||0)+e.a;});
+    const days=Object.keys(dayMap).sort();
+    const trendCtx=document.getElementById('dash-trend-chart').getContext('2d');
+    if(dashTrendChart)dashTrendChart.destroy();
+    dashTrendChart=new Chart(trendCtx,{type:'line',data:{
+      labels:days.map(d=>new Date(d+'T12:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})),
+      datasets:[{label:'Revenue (UGX)',data:days.map(d=>dayMap[d]),borderColor:'#1a3f52',backgroundColor:'rgba(26,63,82,0.08)',borderWidth:2,pointRadius:3,pointBackgroundColor:'#1a3f52',tension:0.3,fill:true}]
+    },options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v>=1000?Math.round(v/1000)+'K':v,font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}}});
+
+    // Expenditure donut
+    const expMap={};ex.forEach(r=>{expMap[r.category]=(expMap[r.category]||0)+Number(r.amount||0);});
+    const expLabels=Object.keys(expMap), expVals=expLabels.map(k=>expMap[k]);
+    const expCtx=document.getElementById('dash-exp-chart').getContext('2d');
+    if(dashExpChart)dashExpChart.destroy();
+    if(expLabels.length){
+      dashExpChart=new Chart(expCtx,{type:'bar',data:{
+        labels:expLabels,
+        datasets:[{data:expVals,backgroundColor:'rgba(192,57,43,0.7)',borderColor:'#c0392b',borderWidth:1,borderRadius:4}]
+      },options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v>=1000?Math.round(v/1000)+'K':v,font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10},maxRotation:30},grid:{display:false}}}}});
+    } else {
+      document.getElementById('dash-exp-chart').parentElement.innerHTML='<div class="es">No expenditure in this period</div>';
+    }
+
+    // Stock alerts
+    const stockRes=await fetch(`${SB}/rest/v1/stock_movements?order=drug_name.asc`,{headers:gh()});
+    const stockAll=await stockRes.json();
+    const drugs={};
+    stockAll.forEach(r=>{
+      if(!drugs[r.drug_name])drugs[r.drug_name]={in:0,out:0};
+      if(r.movement_type==='in')drugs[r.drug_name].in+=r.quantity;
+      else drugs[r.drug_name].out+=r.quantity;
+    });
+    const alerts=Object.entries(drugs).map(([name,d])=>({name,rem:d.in-d.out})).filter(d=>d.rem<=20).sort((a,b)=>a.rem-b.rem);
+    const alertCon=document.getElementById('dash-stock-alerts');
+    const alertCount=document.getElementById('dash-alert-count');
+    alertCount.textContent=alerts.length?alerts.length+' alerts':'';
+    if(!alerts.length){alertCon.innerHTML='<div class="es">All stock levels OK</div>';}
+    else{alertCon.innerHTML=alerts.map(a=>`<div class="alert-row ${a.rem<=5?'critical':'low'}"><span class="alert-drug">${a.name}</span><span class="alert-qty" style="color:${a.rem<=5?'var(--danger)':'var(--orange)'}">${a.rem} remaining ${a.rem<=5?'⚠️':''}</span></div>`).join('');}
+
+    // Top drugs dispensed
+    const drugMap={};
+    dr.forEach(r=>{drugMap[r.drug_name]=(drugMap[r.drug_name]||0)+Number(r.quantity||0);});
+    const topDrugs=Object.entries(drugMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const maxQty=topDrugs[0]?.[1]||1;
+    document.getElementById('dash-top-drugs').innerHTML=topDrugs.length?topDrugs.map(([name,qty])=>`
+      <div style="padding:9px 16px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+          <span>${name}</span><span style="font-family:'DM Mono',monospace;font-weight:500;color:var(--teal)">${qty} units</span>
+        </div>
+        <div style="height:5px;background:var(--border);border-radius:3px"><div style="height:100%;width:${Math.round((qty/maxQty)*100)}%;background:var(--teal-m);border-radius:3px"></div></div>
+      </div>`).join(''):'<div class="es">No drug dispensing records</div>';
+
+    // Activity summary
+    document.getElementById('dash-activity').innerHTML=`
+      <div class="act-row"><span class="act-label">Drug transactions</span><span class="act-val">${dr.length}</span></div>
+      <div class="act-row"><span class="act-label">Lab tests done</span><span class="act-val">${lb.length}</span></div>
+      <div class="act-row"><span class="act-label">RX treatments</span><span class="act-val">${rx.length}</span></div>
+      <div class="act-row"><span class="act-label">ANC visits</span><span class="act-val">${an.length}</span></div>
+      <div class="act-row"><span class="act-label">F/P services</span><span class="act-val">${fp.length}</span></div>
+      <div class="act-row"><span class="act-label">Stock movements</span><span class="act-val">${sm.length}</span></div>
+      <div class="act-row"><span class="act-label">Expenses recorded</span><span class="act-val">${ex.length}</span></div>
+      <div class="act-row" style="background:var(--teal-l)"><span class="act-label" style="font-weight:600">Total entries</span><span class="act-val" style="color:var(--teal-d)">${totalPts+ex.length+sm.length}</span></div>
+    `;
+  }catch(e){document.getElementById('dash-kpis').innerHTML=`<div style="grid-column:1/-1;text-align:center;color:var(--danger);font-size:13px;padding:20px">Error loading dashboard: ${e.message}</div>`;}
 }
 
 function loadAll(){lD();lL();lR();lA();lF();lE();lSt();}
