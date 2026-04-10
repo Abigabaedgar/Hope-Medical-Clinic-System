@@ -599,7 +599,7 @@ async function doLogin(){
   try{
     const res=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SK},body:JSON.stringify({email:em,password:pw})});
     const data=await res.json();
-    if(!res.ok)throw new Error(data.error_description||'Login failed');
+    if(!res.ok)throw new Error(data.error_description||data.error||data.msg||JSON.stringify(data)||'Login failed');
     AT=data.access_token;CU=data.user;
     localStorage.setItem('hmc_token', data.access_token);
     localStorage.setItem('hmc_user', JSON.stringify(data.user));
@@ -613,7 +613,7 @@ async function doLogin(){
     MODS=UPROFILE.assigned_modules||[];
     if(!UPROFILE.is_active)throw new Error('Your account is inactive. Contact administrator.');
     onLogin();
-  }catch(e){err.textContent=e.message==='Invalid login credentials'?'Incorrect email or password.':e.message;err.style.display='block';}
+  }catch(e){err.textContent=e.message;err.style.display='block';}
   btn.innerHTML='Sign In';btn.disabled=false;
 }
 
