@@ -368,7 +368,11 @@ tr:hover td{background:var(--teal-l)}
       <div class="card"><div class="cardh"><div class="cardht"><span class="tdot" style="background:#2da898"></span>New Entry</div></div>
         <div class="cardb"><div class="fg3" style="margin-bottom:12px">
           <div class="fgg"><label>Date</label><input type="date" id="d-dt"/></div>
-          <div class="fgg"><label>Drug Name</label><input type="text" id="d-nm" placeholder="e.g. Amoxicillin 500mg"/></div>
+          <div class="fgg"><label>Drug Name</label>
+          <input type="text" id="d-nm" placeholder="e.g. Amoxicillin 500mg" 
+            oninput="showDrugStock()" onchange="showDrugStock()"/>
+          <div id="d-stock-hint" style="font-size:11px;margin-top:3px;height:14px"></div>
+        </div>
           <div class="fgg"><label>Quantity</label><input type="number" id="d-qt" placeholder="0" min="1" oninput="cDT()"/></div>
           <div class="fgg"><label>Unit Price (UGX)</label><input type="number" id="d-pr" placeholder="0" oninput="cDT()"/></div>
           <div class="fgg"><label>Total (UGX)</label><div class="tdp" id="d-tot">0</div></div>
@@ -787,11 +791,69 @@ async function expCSV(table,fields){
 
 // ── DRUGS ──
 function cDT(){const q=parseFloat(gv('d-qt'))||0,p=parseFloat(gv('d-pr'))||0;document.getElementById('d-tot').textContent=fmt(q*p);}
+
+async function showDrugStock(){
+  const nm=gv('d-nm').trim();
+  const hint=document.getElementById('d-stock-hint');
+  if(!nm||nm.length<2){if(hint)hint.innerHTML='';return;}
+  try{
+    const bal=await getStockBalance(nm);
+    if(!hint)return;
+    if(bal<=0) hint.innerHTML=`<span style="color:var(--danger);font-weight:600">⚠ Not in stock — add via Stock module first</span>`;
+    else if(bal<=10) hint.innerHTML=`<span style="color:var(--orange);font-weight:600">⚠ Low stock: ${bal} units remaining</span>`;
+    else hint.innerHTML=`<span style="color:#1a7a4a;font-weight:500">✓ In stock: ${bal} units available</span>`;
+  }catch(e){if(hint)hint.innerHTML='';}
+}
+
+async function getStockBalance(drugName){
+  // Get all stock movements for this drug and calculate balance
+  const r=await fetch(`${SB}/rest/v1/stock_movements?drug_name=eq.${encodeURIComponent(drugName)}&order=created_at.asc`,{headers:gh()});
+  const rows=await r.json();
+  let bal=0;
+  rows.forEach(r=>{
+    if(r.movement_type==='in') bal+=Number(r.quantity||0);
+    else bal-=Number(r.quantity||0);
+  });
+  return bal;
+}
+
 async function subD(){
   const nm=gv('d-nm').trim(),qt=parseInt(gv('d-qt')),pr=parseFloat(gv('d-pr')),dt=gv('d-dt');
   if(!nm||!qt||!pr||!dt){toast('Fill all fields',true);return;}
   ld('d-sub',true);
-  try{const rows=await ins('retail_drugs',{drug_name:nm,quantity:qt,unit_price:pr,entry_date:dt,entered_by:gs()});toast('✓ Saved');cf('d');lD();}catch(e){toast('Error: '+e.message,true);}
+  try{
+    // Step 1: Check current stock balance
+    const balance=await getStockBalance(nm);
+
+    // Step 2: Block if insufficient stock
+    if(balance<=0){
+      toast(`No stock found for "${nm}". Add stock first in the Stock module.`,true);
+      ld('d-sub',false);document.getElementById('d-sub').innerHTML='Add Entry';return;
+    }
+    if(qt>balance){
+      toast(`Insufficient stock for "${nm}". Available: ${balance} units, Requested: ${qt} units.`,true);
+      ld('d-sub',false);document.getElementById('d-sub').innerHTML='Add Entry';return;
+    }
+
+    // Step 3: Save the retail drug entry
+    await ins('retail_drugs',{drug_name:nm,quantity:qt,unit_price:pr,entry_date:dt,entered_by:gs()});
+
+    // Step 4: Auto-create stock OUT movement
+    await ins('stock_movements',{
+      movement_type:'out',
+      drug_name:nm,
+      quantity:qt,
+      unit_cost:pr,
+      reference:'Auto — Retail Drugs',
+      notes:`Dispensed via Retail Drugs on ${dt}`,
+      entry_date:dt,
+      entered_by:gs()
+    });
+
+    toast(`✓ Saved — stock updated (${balance-qt} ${nm} remaining)`);
+    cf('d');lD();loadStockSummary();
+
+  }catch(e){toast('Error: '+e.message,true);}
   ld('d-sub',false);document.getElementById('d-sub').innerHTML='Add Entry';
 }
 async function lD(){
