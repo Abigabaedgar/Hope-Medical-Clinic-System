@@ -604,7 +604,13 @@ async function doLogin(){
     localStorage.setItem('hmc_token', data.access_token);
     localStorage.setItem('hmc_user', JSON.stringify(data.user));
     // Load profile
-    const pres=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${CU.id}`,{headers:gh()});
+    const pres=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${CU.id}`,{
+      headers:{
+        'Content-Type':'application/json',
+        'apikey':SK,
+        'Authorization':'Bearer '+SK
+      }
+    });
     const pdata=await pres.json();
     if(!pdata.length)throw new Error('No profile found. Contact administrator.');
     UPROFILE=pdata[0];
@@ -1276,7 +1282,7 @@ async function restoreSession(){
   try{
     // Verify token is still valid
     const res=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${JSON.parse(user).id}`,{
-      headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+token}
+      headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK}
     });
     if(!res.ok)throw new Error('Token expired');
     const pdata=await res.json();
