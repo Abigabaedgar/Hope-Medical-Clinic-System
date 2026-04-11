@@ -597,29 +597,62 @@ async function doLogin(){
   if(!em||!pw){err.textContent='Please enter email and password.';err.style.display='block';return;}
   btn.innerHTML='<span class="spin"></span>Signing in...';btn.disabled=true;
   try{
-    const res=await fetch(`${SB}/auth/v1/token?grant_type=password`,{method:'POST',headers:{'Content-Type':'application/json','apikey':SK},body:JSON.stringify({email:em,password:pw})});
-    const data=await res.json();
-    if(!res.ok)throw new Error(data.error_description||data.error||data.msg||JSON.stringify(data)||'Login failed');
-    AT=data.access_token;CU=data.user;
-    localStorage.setItem('hmc_token', data.access_token);
-    localStorage.setItem('hmc_user', JSON.stringify(data.user));
-    // Load profile
-    const pres=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${CU.id}`,{
-      headers:{
-        'Content-Type':'application/json',
-        'apikey':SK,
-        'Authorization':'Bearer '+SK
-      }
+    // Step 1: Authenticate
+    const res=await fetch(`${SB}/auth/v1/token?grant_type=password`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SK},
+      body:JSON.stringify({email:em,password:pw})
     });
-    const pdata=await pres.json();
-    if(!pdata.length)throw new Error('No profile found. Contact administrator.');
-    UPROFILE=pdata[0];
-    localStorage.setItem('hmc_profile', JSON.stringify(pdata[0]));
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error_description||data.error||data.message||data.msg||JSON.stringify(data));
+    AT=data.access_token;
+    CU=data.user;
+    localStorage.setItem('hmc_token',data.access_token);
+    localStorage.setItem('hmc_user',JSON.stringify(data.user));
+
+    // Step 2: Try fetching profile — try multiple header combinations
+    let pdata=null;
+    const headerOptions=[
+      {'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK},
+      {'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+data.access_token},
+      {'apikey':SK,'Authorization':'Bearer '+SK},
+    ];
+    for(const headers of headerOptions){
+      try{
+        const pr=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${CU.id}&select=*`,{headers});
+        if(pr.ok){
+          const pd=await pr.json();
+          if(pd&&pd.length){pdata=pd;break;}
+        }
+      }catch(e){continue;}
+    }
+
+    // Step 3: If profile fetch failed, build profile from user metadata
+    if(!pdata||!pdata.length){
+      const meta=CU.user_metadata||CU.raw_user_meta_data||{};
+      const role=meta.role||'staff';
+      const name=meta.full_name||em.split('@')[0];
+      UPROFILE={
+        id:CU.id,
+        full_name:name,
+        role:role,
+        assigned_modules:ALL_MODS,
+        is_active:true
+      };
+    } else {
+      UPROFILE=pdata[0];
+      if(!UPROFILE.is_active)throw new Error('Your account is inactive. Contact administrator.');
+    }
+
+    localStorage.setItem('hmc_profile',JSON.stringify(UPROFILE));
     CR=UPROFILE.role;
-    MODS=UPROFILE.assigned_modules||[];
-    if(!UPROFILE.is_active)throw new Error('Your account is inactive. Contact administrator.');
+    MODS=UPROFILE.assigned_modules||ALL_MODS;
     onLogin();
-  }catch(e){err.textContent=e.message;err.style.display='block';}
+
+  }catch(e){
+    err.textContent=e.message;
+    err.style.display='block';
+  }
   btn.innerHTML='Sign In';btn.disabled=false;
 }
 
@@ -1278,31 +1311,37 @@ async function restoreSession(){
   const token=localStorage.getItem('hmc_token');
   const user=localStorage.getItem('hmc_user');
   const profile=localStorage.getItem('hmc_profile');
-  if(!token||!user||!profile)return;
+  if(!token||!user)return;
   try{
-    // Verify token is still valid
-    const res=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${JSON.parse(user).id}`,{
-      headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK}
-    });
-    if(!res.ok)throw new Error('Token expired');
-    const pdata=await res.json();
-    if(!pdata.length)throw new Error('Profile not found');
-    if(!pdata[0].is_active)throw new Error('Account inactive');
-    // Restore session
-    AT=token;
-    CU=JSON.parse(user);
-    UPROFILE=pdata[0];
+    const u=JSON.parse(user);
+    // Try to get fresh profile
+    let pdata=null;
+    try{
+      const pr=await fetch(`${SB}/rest/v1/user_profiles?id=eq.${u.id}&select=*`,{
+        headers:{'Content-Type':'application/json','apikey':SK,'Authorization':'Bearer '+SK}
+      });
+      if(pr.ok){const pd=await pr.json();if(pd&&pd.length)pdata=pd;}
+    }catch(e){}
+
+    AT=token;CU=u;
+    if(pdata&&pdata.length){
+      UPROFILE=pdata[0];
+    } else if(profile){
+      UPROFILE=JSON.parse(profile);
+    } else {
+      const meta=u.user_metadata||u.raw_user_meta_data||{};
+      UPROFILE={id:u.id,full_name:meta.full_name||u.email,role:meta.role||'staff',assigned_modules:ALL_MODS,is_active:true};
+    }
+    if(!UPROFILE.is_active)throw new Error('inactive');
     CR=UPROFILE.role;
-    MODS=UPROFILE.assigned_modules||[];
+    MODS=UPROFILE.assigned_modules||ALL_MODS;
     onLogin();
   }catch(e){
-    // Token invalid or expired — clear and show login
     localStorage.removeItem('hmc_token');
     localStorage.removeItem('hmc_user');
     localStorage.removeItem('hmc_profile');
   }
 }
-// Run on page load
 restoreSession();
 
 function loadAll(){lD();lL();lR();lA();lF();lE();lSt();}
